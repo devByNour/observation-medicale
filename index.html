@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observation Médicale - Plateforme pour étudiants en médecine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --medical-blue: #1E88E5;
+            --light-blue: #E3F2FD;
+            --light-gray: #F5F7FA;
+            --text-primary: #374151;
+            --text-secondary: #6B7280;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            color: var(--text-primary);
+            background-color: #f9fafb;
+        }
+
+        .medical-shadow {
+            box-shadow: 0 4px 6px -1px rgba(30, 136, 229, 0.1), 0 2px 4px -1px rgba(30, 136, 229, 0.06);
+        }
+
+        .medical-border {
+            border-left: 4px solid var(--medical-blue);
+        }
+
+        .section-title {
+            position: relative;
+            padding-left: 16px;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            background-color: var(--medical-blue);
+            border-radius: 2px;
+        }
+
+        .accordion-header {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .accordion-header:hover {
+            background-color: var(--light-blue);
+        }
+
+        .accordion-content {
+            max-height: 0px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .accordion-content.open {
+            max-height: 5000px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--medical-blue);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .observation-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .observation-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(30, 136, 229, 0.1), 0 4px 6px -2px rgba(30, 136, 229, 0.05);
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            .print-visible {
+                display: block !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-btn {
+                padding: 10px 12px;
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            
+            .mobile-btn-full {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .mobile-stack {
+                flex-direction: column;
+            }
+            
+            .mobile-space-y > * {
+                margin-bottom: 12px;
+            }
+            
+            .mobile-space-y > *:last-child {
+                margin-bottom: 0;
+            }
+            
+            .mobile-text-center {
+                text-align: center;
+            }
+            
+            .mobile-p-4 {
+                padding: 1rem;
+            }
+            
+            .mobile-p-3 {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white medical-shadow sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-100 p-2 rounded-lg">
+                        <i class="fas fa-stethoscope text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800">Observation Médicale</h1>
+                        <p class="text-sm text-gray-600 hidden md:block">Plateforme pour étudiants en médecine</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-2 md:space-x-4">
+                    <button id="dashboardBtn" class="mobile-btn px-3 md:px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition flex items-center">
+                        <i class="fas fa-home md:mr-2"></i>
+                        <span class="hidden md:inline">Tableau de bord</span>
+                    </button>
+                    <button id="newObservationBtn" class="mobile-btn px-3 md:px-4 py-2 bg-white text-blue-600 border border-blue-600 rounded-lg font-medium hover:bg-blue-50 transition flex items-center">
+                        <i class="fas fa-plus md:mr-2"></i>
+                        <span class="hidden md:inline">Nouvelle observation</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-4 md:py-6">
+        <div id="dashboardPage" class="page">
+            <div class="mb-6 md:mb-8">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-2">Tableau de bord</h2>
+                <p class="text-gray-600 text-sm md:text-base">Consultez et gérez toutes vos observations médicales</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                <div class="bg-white rounded-xl p-4 md:p-6 medical-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Observations totales</p>
+                            <h3 id="totalObservations" class="text-2xl md:text-3xl font-bold text-gray-800 mt-1 md:mt-2">0</h3>
+                        </div>
+                        <div class="bg-blue-100 p-2 md:p-3 rounded-lg">
+                            <i class="fas fa-file-medical text-blue-600 text-xl md:text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-4 md:p-6 medical-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Aujourd'hui</p>
+                            <h3 id="todayObservations" class="text-2xl md:text-3xl font-bold text-gray-800 mt-1 md:mt-2">0</h3>
+                        </div>
+                        <div class="bg-green-100 p-2 md:p-3 rounded-lg">
+                            <i class="fas fa-calendar-day text-green-600 text-xl md:text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-4 md:p-6 medical-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">À compléter</p>
+                            <h3 id="incompleteObservations" class="text-2xl md:text-3xl font-bold text-gray-800 mt-1 md:mt-2">0</h3>
+                        </div>
+                        <div class="bg-yellow-100 p-2 md:p-3 rounded-lg">
+                            <i class="fas fa-exclamation-circle text-yellow-600 text-xl md:text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-4 md:p-6 medical-shadow mb-6 md:mb-8">
+                <div class="mobile-space-y">
+                    <div class="w-full">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="searchInput" placeholder="Rechercher par nom, symptôme, service..." 
+                                   class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <select id="serviceFilter" class="mobile-btn-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <option value="">Tous les services</option>
+                            <option value="Cardiologie">Cardiologie</option>
+                            <option value="Pneumologie">Pneumologie</option>
+                            <option value="Gastro-entérologie">Gastro-entérologie</option>
+                            <option value="Neurologie">Neurologie</option>
+                            <option value="Urgences">Urgences</option>
+                        </select>
+                        
+                        <select id="symptomFilter" class="mobile-btn-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <option value="">Symptôme principal</option>
+                            <option value="Douleur thoracique">Douleur thoracique</option>
+                            <option value="Dyspnée">Dyspnée</option>
+                            <option value="Céphalée">Céphalée</option>
+                            <option value="Douleur abdominale">Douleur abdominale</option>
+                            <option value="Fièvre">Fièvre</option>
+                        </select>
+                        
+                        <input type="date" id="dateFilter" class="mobile-btn-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        
+                        <button id="clearFilters" class="mobile-btn-full px-3 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
+                            <i class="fas fa-times mr-2"></i>Effacer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 space-y-3 md:space-y-0">
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800">Observations récentes</h3>
+                    <button id="newObservationFromDashboard" class="mobile-btn-full md:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center">
+                        <i class="fas fa-plus mr-2"></i>Nouvelle observation
+                    </button>
+                </div>
+                
+                <div id="observationsContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+                    <div id="noObservations" class="col-span-full bg-white rounded-xl p-8 md:p-12 text-center medical-shadow">
+                        <div class="text-blue-100 mb-4">
+                            <i class="fas fa-file-medical text-5xl md:text-6xl"></i>
+                        </div>
+                        <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-2">Aucune observation</h4>
+                        <p class="text-gray-500 mb-6 text-sm md:text-base">Commencez par créer votre première observation médicale</p>
+                        <button id="createFirstObservation" class="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
+                            <i class="fas fa-plus mr-2"></i>Créer une observation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="newObservationPage" class="page hidden">
+            <div class="bg-white rounded-xl p-4 md:p-6 medical-shadow mb-6 md:mb-8">
+                <div class="mb-4">
+                    <h2 class="text-lg md:text-2xl font-bold text-gray-800 mb-2">Nouvelle observation médicale</h2>
+                    <p class="text-gray-600 text-sm md:text-base">Remplissez toutes les sections du formulaire</p>
+                </div>
+                
+                <div class="progress-bar mb-2">
+                    <div id="formProgress" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-xs md:text-sm text-gray-500">
+                    <span id="progressText">0% complété</span>
+                    <span>Sections: <span id="completedSections">0</span>/5</span>
+                </div>
+            </div>
+
+            <form id="observationForm" class="space-y-4 md:space-y-6">
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="a">
+                        <div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">A. Identité du patient</h3>
+                            <p class="text-gray-600 text-sm">Informations démographiques et administratives</p>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Nom complet *</label>
+                                <input type="text" id="patientName" name="patientName" required 
+                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 md:gap-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Âge *</label>
+                                    <input type="number" id="patientAge" name="patientAge" min="0" max="120" required 
+                                           class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Sexe *</label>
+                                    <select id="patientGender" name="patientGender" required 
+                                            class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="Masculin">Masculin</option>
+                                        <option value="Féminin">Féminin</option>
+                                        <option value="Autre">Autre</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Situation familiale</label>
+                                <select id="familySituation" name="familySituation" 
+                                        class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                    <option value="">Sélectionner</option>
+                                    <option value="Célibataire">Célibataire</option>
+                                    <option value="Marié(e)">Marié(e)</option>
+                                    <option value="Divorcé(e)">Divorcé(e)</option>
+                                    <option value="Veuf(ve)">Veuf(ve)</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Nombre d'enfants</label>
+                                <input type="number" id="childrenCount" name="childrenCount" min="0" 
+                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Profession</label>
+                                <input type="text" id="profession" name="profession" 
+                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Service hospitalier *</label>
+                                <select id="hospitalService" name="hospitalService" required 
+                                        class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                    <option value="">Sélectionner</option>
+                                    <option value="Cardiologie">Cardiologie</option>
+                                    <option value="Pneumologie">Pneumologie</option>
+                                    <option value="Gastro-entérologie">Gastro-entérologie</option>
+                                    <option value="Neurologie">Neurologie</option>
+                                    <option value="Urgences">Urgences</option>
+                                    <option value="Médecine interne">Médecine interne</option>
+                                    <option value="Chirurgie">Chirurgie</option>
+                                </select>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Symptôme principal *</label>
+                                <input type="text" id="mainSymptom" name="mainSymptom" required 
+                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                       placeholder="Ex: Douleur thoracique, dyspnée, céphalée...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="b">
+                        <div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">B. Histoire de la maladie</h3>
+                            <p class="text-gray-600 text-sm">Chronologie et caractéristiques des symptômes</p>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Date d'apparition *</label>
+                                <input type="date" id="symptomDate" name="symptomDate" required 
+                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Nature du symptôme</label>
+                                <select id="symptomNature" name="symptomNature" 
+                                        class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                    <option value="">Sélectionner</option>
+                                    <option value="Aiguë">Aiguë</option>
+                                    <option value="Chronique">Chronique</option>
+                                    <option value="Intermittente">Intermittente</option>
+                                    <option value="Progressive">Progressive</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Mode de début</label>
+                                <select id="symptomOnset" name="symptomOnset" 
+                                        class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                    <option value="">Sélectionner</option>
+                                    <option value="Brutal">Brutal</option>
+                                    <option value="Progressif">Progressif</option>
+                                    <option value="Insidieux">Insidieux</option>
+                                </select>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Facteurs déclenchants</label>
+                                <input type="text" id="triggerFactors" name="triggerFactors" 
+                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                       placeholder="Ex: Effort, stress, alimentation...">
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Facteurs calmants</label>
+                                <input type="text" id="reliefFactors" name="reliefFactors" 
+                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                       placeholder="Ex: Repos, médicaments, position...">
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Symptômes associés</label>
+                                <textarea id="associatedSymptoms" name="associatedSymptoms" rows="3" 
+                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                          placeholder="Décrivez les autres symptômes associés..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="c">
+                        <div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">C. Antécédents</h3>
+                            <p class="text-gray-600 text-sm">Antécédents personnels, familiaux et gynéco-obstétricaux</p>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="space-y-4 md:space-y-6">
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Antécédents personnels</label>
+                                <textarea id="personalHistory" name="personalHistory" rows="3" 
+                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                          placeholder="Maladies, interventions chirurgicales, allergies, traitements en cours..."></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Antécédents familiaux</label>
+                                <textarea id="familyHistory" name="familyHistory" rows="3" 
+                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                          placeholder="Maladies héréditaires, cancers, pathologies cardiovasculaires..."></textarea>
+                            </div>
+                            
+                            <div id="gynecoHistorySection" class="hidden">
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Antécédents gynéco-obstétricaux</label>
+                                <textarea id="gynecoHistory" name="gynecoHistory" rows="3" 
+                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                          placeholder="Gestité, parité, contraception, dernières règles..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="d">
+                        <div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">D. Examen général</h3>
+                            <p class="text-gray-600 text-sm">État de conscience et constantes vitales</p>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base">État de conscience *</label>
+                                <select id="consciousness" name="consciousness" required 
+                                        class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                    <option value="">Sélectionner</option>
+                                    <option value="Conscient">Conscient</option>
+                                    <option value="Somnolent">Somnolent</option>
+                                    <option value="Confus">Confus</option>
+                                    <option value="Comateux">Comateux</option>
+                                </select>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <h4 class="text-md md:text-lg font-semibold text-gray-800 mb-4">Constantes vitales</h4>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2 text-sm">TA (mmHg)</label>
+                                        <input type="text" id="bloodPressure" name="bloodPressure" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                                               placeholder="Ex: 120/80">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2 text-sm">Pouls (bpm)</label>
+                                        <input type="number" id="pulse" name="pulse" min="20" max="200" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                                               placeholder="Ex: 72">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2 text-sm">Température (°C)</label>
+                                        <input type="number" id="temperature" name="temperature" min="34" max="42" step="0.1" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                                               placeholder="Ex: 37.2">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2 text-sm">Poids (kg)</label>
+                                        <input type="number" id="weight" name="weight" min="0" max="300" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                                               placeholder="Ex: 70">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2 text-sm">FR (cpm)</label>
+                                        <input type="number" id="respiratoryRate" name="respiratoryRate" min="8" max="50" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                                               placeholder="Ex: 16">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="e">
+                        <div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">E. Examens par appareil</h3>
+                            <p class="text-gray-600 text-sm">Examen clinique systématique</p>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="space-y-4 md:space-y-6">
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil respiratoire</label>
+                                <textarea id="respiratoryExam" name="respiratoryExam" rows="2" 
+                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                          placeholder="Auscultation, percussion, toux, expectoration..."></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil cardio-vasculaire</label>
+                                <textarea id="cardiovascularExam" name="cardiovascularExam" rows="2" 
+                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                          placeholder="Bruits du cœur, pouls, œdèmes, turgescence jugulaire..."></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil digestif</label>
+                                <textarea id="digestiveExam" name="digestiveExam" rows="2" 
+                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                          placeholder="Abdomen, foie, rate, transit, selles..."></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil urinaire</label>
+                                <textarea id="urinaryExam" name="urinaryExam" rows="2" 
+                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                          placeholder="Douleurs lombaires, brûlures mictionnelles, diurèse..."></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil neurologique</label>
+                                <textarea id="neurologicalExam" name="neurologicalExam" rows="2" 
+                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                          placeholder="Motricité, sensibilité, réflexes, coordination..."></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil hématologique</label>
+                                <textarea id="hematologicalExam" name="hematologicalExam" rows="2" 
+                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
+                                          placeholder="Pâleur, ictère, ecchymoses, adénopathies..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-between pt-6 space-y-4 md:space-y-0">
+                    <button type="button" id="cancelObservation" class="mobile-btn-full md:w-auto px-6 py-3 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        <i class="fas fa-times mr-2"></i>Annuler
+                    </button>
+                    
+                    <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4">
+                        <button type="button" id="saveDraft" class="mobile-btn-full md:w-auto px-6 py-3 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition">
+                            <i class="fas fa-save mr-2"></i>Enregistrer brouillon
+                        </button>
+                        
+                        <button type="submit" id="submitObservation" class="mobile-btn-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-check mr-2"></i>Terminer l'observation
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="observationDetailModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-20">
+            <div class="relative top-4 md:top-10 mx-auto p-4 md:p-6 max-w-4xl w-full">
+                <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+                    <div class="p-4 md:p-6 border-b">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0">
+                            <div>
+                                <h3 id="modalPatientName" class="text-lg md:text-2xl font-bold text-gray-800"></h3>
+                                <div class="flex flex-wrap items-center mt-2 space-x-0 md:space-x-4 space-y-2 md:space-y-0">
+                                    <span id="modalPatientAgeGender" class="text-gray-600 text-sm md:text-base"></span>
+                                    <span id="modalService" class="px-2 md:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs md:text-sm"></span>
+                                    <span id="modalDate" class="text-gray-500 text-xs md:text-sm"></span>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button id="printObservation" class="mobile-btn px-3 md:px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
+                                    <i class="fas fa-print mr-1 md:mr-2"></i><span class="hidden md:inline">Imprimer</span>
+                                </button>
+                                <button id="editObservation" class="mobile-btn px-3 md:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
+                                    <i class="fas fa-edit mr-1 md:mr-2"></i><span class="hidden md:inline">Modifier</span>
+                                </button>
+                                <button id="closeModal" class="mobile-btn px-3 md:px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 md:p-6 max-h-80 md:max-h-96 overflow-y-auto">
+                        <div id="modalContent" class="space-y-4 md:space-y-6">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 mt-8 md:mt-12">
+        <div class="container mx-auto px-4 py-4 md:py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-blue-100 p-2 rounded-lg">
+                            <i class="fas fa-stethoscope text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-md md:text-lg font-bold text-gray-800">Observation Médicale</h3>
+                            <p class="text-gray-600 text-xs md:text-sm">Outils pour étudiants en médecine</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-gray-500 text-xs md:text-sm text-center md:text-left">
+                    <p class="mt-1">Données sauvegardées localement sur votre appareil.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-blue-600 text-white px-4 md:px-6 py-3 rounded-lg shadow-lg max-w-xs md:max-w-sm">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2 md:mr-3"></i>
+            <span id="toastMessage" class="text-sm md:text-base">Observation enregistrée avec succès</span>
+        </div>
+    </div>
+
+    <script>
+        const appState = {
+            currentPage: 'dashboard',
+            observations: [],
+            editingObservationId: null,
+            currentObservation: null
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadObservations();
+            
+            setupEventListeners();
+            
+            initAccordions();
+            
+            updateStats();
+            
+            document.getElementById('symptomDate').valueAsDate = new Date();
+            
+            document.getElementById('patientGender').addEventListener('change', function() {
+                const gynecoSection = document.getElementById('gynecoHistorySection');
+                if (this.value === 'Féminin') {
+                    gynecoSection.classList.remove('hidden');
+                } else {
+                    gynecoSection.classList.add('hidden');
+                }
+            });
+            
+            document.querySelectorAll('#observationForm input, #observationForm select, #observationForm textarea').forEach(element => {
+                element.addEventListener('input', updateFormProgress);
+            });
+            
+            setupMobileBehaviors();
+        });
+
+        function setupMobileBehaviors() {
+            document.getElementById('observationDetailModal').addEventListener('click', function(e) {
+                if (e.target === this && window.innerWidth < 768) {
+                    closeModal();
+                }
+            });
+            
+            function adjustModalHeight() {
+                const modal = document.getElementById('observationDetailModal');
+                if (window.innerWidth < 768) {
+                    const modalContent = modal.querySelector('.overflow-y-auto');
+                    if (modalContent) {
+                        modalContent.style.maxHeight = 'calc(100vh - 150px)';
+                    }
+                }
+            }
+            
+            window.addEventListener('resize', adjustModalHeight);
+        }
+
+        function loadObservations() {
+            const storedObservations = localStorage.getItem('medicalObservations');
+            if (storedObservations) {
+                appState.observations = JSON.parse(storedObservations);
+                renderObservations();
+            }
+        }
+
+        function saveObservations() {
+            localStorage.setItem('medicalObservations', JSON.stringify(appState.observations));
+            updateStats();
+            renderObservations();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('dashboardBtn').addEventListener('click', showDashboard);
+            document.getElementById('newObservationBtn').addEventListener('click', showNewObservation);
+            document.getElementById('newObservationFromDashboard').addEventListener('click', showNewObservation);
+            document.getElementById('createFirstObservation').addEventListener('click', showNewObservation);
+            
+            document.getElementById('observationForm').addEventListener('submit', saveObservation);
+            document.getElementById('cancelObservation').addEventListener('click', cancelObservation);
+            document.getElementById('saveDraft').addEventListener('click', saveDraft);
+            
+            document.getElementById('searchInput').addEventListener('input', filterObservations);
+            document.getElementById('serviceFilter').addEventListener('change', filterObservations);
+            document.getElementById('symptomFilter').addEventListener('change', filterObservations);
+            document.getElementById('dateFilter').addEventListener('change', filterObservations);
+            document.getElementById('clearFilters').addEventListener('click', clearFilters);
+            
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('printObservation').addEventListener('click', printObservation);
+            document.getElementById('editObservation').addEventListener('click', editObservation);
+            
+            setInterval(autoSaveDraft, 30000);
+        }
+
+        function autoSaveDraft() {
+            if (appState.currentPage === 'newObservation' && appState.editingObservationId === null) {
+                const form = document.getElementById('observationForm');
+                const patientName = document.getElementById('patientName').value;
+                
+                if (patientName.trim() !== '') {
+                    saveDraft();
+                    console.log('Brouillon auto-sauvegardé');
+                }
+            }
+        }
+
+        function initAccordions() {
+            document.querySelectorAll('.accordion-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('i');
+                    
+                    content.classList.toggle('open');
+                    
+                    if (content.classList.contains('open')) {
+                        icon.style.transform = 'rotate(180deg)';
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    } else {
+                        icon.style.transform = 'rotate(0deg)';
+                        content.style.maxHeight = '0';
+                    }
+                });
+                
+                const content = header.nextElementSibling;
+                content.classList.remove('open');
+                content.style.maxHeight = '0';
+            });
+        }
+
+        function closeAllAccordions() {
+            document.querySelectorAll('.accordion-content').forEach(content => {
+                content.classList.remove('open');
+                content.style.maxHeight = '0';
+            });
+            
+            document.querySelectorAll('.accordion-header i').forEach(icon => {
+                icon.style.transform = 'rotate(0deg)';
+            });
+        }
+
+        function updateFormProgress() {
+            const requiredFields = document.querySelectorAll('#observationForm [required]');
+            const filledRequiredFields = Array.from(requiredFields).filter(field => field.value.trim() !== '').length;
+            const progress = Math.round((filledRequiredFields / requiredFields.length) * 100);
+            
+            document.getElementById('formProgress').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `${progress}% complété`;
+            
+            const sections = document.querySelectorAll('.accordion-section');
+            let completedSections = 0;
+            
+            sections.forEach(section => {
+                const requiredInSection = section.querySelectorAll('[required]');
+                if (requiredInSection.length > 0) {
+                    const filledInSection = Array.from(requiredInSection).filter(field => field.value.trim() !== '').length;
+                    if (filledInSection === requiredInSection.length) {
+                        completedSections++;
+                    }
+                }
+            });
+            
+            document.getElementById('completedSections').textContent = completedSections;
+        }
+
+        function showDashboard() {
+            document.getElementById('dashboardPage').classList.remove('hidden');
+            document.getElementById('newObservationPage').classList.add('hidden');
+            appState.currentPage = 'dashboard';
+            updateStats();
+            renderObservations();
+        }
+
+        function showNewObservation() {
+            document.getElementById('dashboardPage').classList.add('hidden');
+            document.getElementById('newObservationPage').classList.remove('hidden');
+            appState.currentPage = 'newObservation';
+            appState.editingObservationId = null;
+            
+            document.getElementById('observationForm').reset();
+            
+            document.getElementById('gynecoHistorySection').classList.add('hidden');
+            
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            document.getElementById('symptomDate').value = formattedDate;
+            
+            closeAllAccordions();
+            
+            updateFormProgress();
+            
+            if (window.innerWidth < 768) {
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function saveObservation(e) {
+            e.preventDefault();
+            
+            const observation = gatherFormData();
+            observation.status = 'completed';
+            observation.completedDate = new Date().toISOString();
+            
+            if (appState.editingObservationId !== null) {
+                const index = appState.observations.findIndex(obs => obs.id === appState.editingObservationId);
+                if (index !== -1) {
+                    appState.observations[index] = observation;
+                }
+            } else {
+                observation.id = Date.now().toString();
+                observation.createdDate = new Date().toISOString();
+                appState.observations.unshift(observation);
+            }
+            
+            saveObservations();
+            showToast('Observation enregistrée avec succès');
+            showDashboard();
+        }
+
+        function saveDraft() {
+            const observation = gatherFormData();
+            observation.status = 'draft';
+            
+            if (appState.editingObservationId !== null) {
+                const index = appState.observations.findIndex(obs => obs.id === appState.editingObservationId);
+                if (index !== -1) {
+                    appState.observations[index] = observation;
+                }
+            } else {
+                observation.id = Date.now().toString();
+                observation.createdDate = new Date().toISOString();
+                appState.observations.unshift(observation);
+            }
+            
+            saveObservations();
+            showToast('Brouillon enregistré');
+            if (window.innerWidth >= 768) {
+                showDashboard();
+            }
+        }
+
+        function cancelObservation() {
+            if (confirm('Voulez-vous vraiment annuler? Les modifications non enregistrées seront perdues.')) {
+                showDashboard();
+            }
+        }
+
+        function gatherFormData() {
+            return {
+                patientName: document.getElementById('patientName').value,
+                patientAge: document.getElementById('patientAge').value,
+                patientGender: document.getElementById('patientGender').value,
+                familySituation: document.getElementById('familySituation').value,
+                childrenCount: document.getElementById('childrenCount').value,
+                profession: document.getElementById('profession').value,
+                hospitalService: document.getElementById('hospitalService').value,
+                mainSymptom: document.getElementById('mainSymptom').value,
+                symptomDate: document.getElementById('symptomDate').value,
+                symptomNature: document.getElementById('symptomNature').value,
+                symptomOnset: document.getElementById('symptomOnset').value,
+                triggerFactors: document.getElementById('triggerFactors').value,
+                reliefFactors: document.getElementById('reliefFactors').value,
+                associatedSymptoms: document.getElementById('associatedSymptoms').value,
+                personalHistory: document.getElementById('personalHistory').value,
+                familyHistory: document.getElementById('familyHistory').value,
+                gynecoHistory: document.getElementById('patientGender').value === 'Féminin' ? document.getElementById('gynecoHistory').value : '',
+                consciousness: document.getElementById('consciousness').value,
+                bloodPressure: document.getElementById('bloodPressure').value,
+                pulse: document.getElementById('pulse').value,
+                temperature: document.getElementById('temperature').value,
+                weight: document.getElementById('weight').value,
+                respiratoryRate: document.getElementById('respiratoryRate').value,
+                respiratoryExam: document.getElementById('respiratoryExam').value,
+                cardiovascularExam: document.getElementById('cardiovascularExam').value,
+                digestiveExam: document.getElementById('digestiveExam').value,
+                urinaryExam: document.getElementById('urinaryExam').value,
+                neurologicalExam: document.getElementById('neurologicalExam').value,
+                hematologicalExam: document.getElementById('hematologicalExam').value
+            };
+        }
+
+        function renderObservations(filteredObservations = null) {
+            const observations = filteredObservations || appState.observations;
+            const container = document.getElementById('observationsContainer');
+            const noObservations = document.getElementById('noObservations');
+            
+            if (observations.length === 0) {
+                container.innerHTML = '';
+                container.appendChild(noObservations);
+                noObservations.classList.remove('hidden');
+                return;
+            }
+            
+            noObservations.classList.add('hidden');
+            
+            let html = '';
+            observations.forEach(obs => {
+                const date = new Date(obs.createdDate).toLocaleDateString('fr-FR');
+                const statusClass = obs.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+                const statusText = obs.status === 'completed' ? 'Complète' : 'Brouillon';
+                
+                html += `
+                <div class="observation-card bg-white rounded-xl p-4 md:p-6 medical-shadow cursor-pointer" data-id="${obs.id}">
+                    <div class="flex justify-between items-start mb-3 md:mb-4">
+                        <div class="overflow-hidden">
+                            <h4 class="text-base md:text-lg font-bold text-gray-800 truncate">${obs.patientName}</h4>
+                            <p class="text-gray-600 text-xs md:text-sm">${obs.patientAge} ans, ${obs.patientGender}</p>
+                        </div>
+                        <span class="px-2 md:px-3 py-1 ${statusClass} rounded-full text-xs font-medium whitespace-nowrap">${statusText}</span>
+                    </div>
+                    
+                    <div class="mb-3 md:mb-4">
+                        <div class="flex items-center text-gray-700 mb-1 md:mb-2">
+                            <i class="fas fa-hospital mr-2 text-blue-500 text-xs md:text-sm"></i>
+                            <span class="text-xs md:text-sm truncate">${obs.hospitalService}</span>
+                        </div>
+                        <div class="flex items-center text-gray-700">
+                            <i class="fas fa-stethoscope mr-2 text-blue-500 text-xs md:text-sm"></i>
+                            <span class="text-xs md:text-sm truncate">${obs.mainSymptom}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center text-gray-500 text-xs md:text-sm">
+                        <span>${date}</span>
+                        <div class="flex space-x-1 md:space-x-2">
+                            <button class="view-btn px-2 md:px-3 py-1 text-blue-600 hover:bg-blue-50 rounded text-xs md:text-sm">
+                                <i class="fas fa-eye mr-1"></i><span class="hidden md:inline">Voir</span>
+                            </button>
+                            <button class="delete-btn px-2 md:px-3 py-1 text-red-600 hover:bg-red-50 rounded text-xs md:text-sm">
+                                <i class="fas fa-trash mr-1"></i><span class="hidden md:inline">Suppr</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            document.querySelectorAll('.observation-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('view-btn') && !e.target.classList.contains('delete-btn') && 
+                        !e.target.closest('.view-btn') && !e.target.closest('.delete-btn')) {
+                        const id = this.getAttribute('data-id');
+                        viewObservation(id);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = this.closest('.observation-card').getAttribute('data-id');
+                    viewObservation(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = this.closest('.observation-card').getAttribute('data-id');
+                    deleteObservation(id);
+                });
+            });
+        }
+
+        function viewObservation(id) {
+            const observation = appState.observations.find(obs => obs.id === id);
+            if (!observation) return;
+            
+            appState.currentObservation = observation;
+            
+            document.getElementById('modalPatientName').textContent = observation.patientName;
+            document.getElementById('modalPatientAgeGender').textContent = `${observation.patientAge} ans, ${observation.patientGender}`;
+            document.getElementById('modalService').textContent = observation.hospitalService;
+            document.getElementById('modalDate').textContent = new Date(observation.createdDate).toLocaleDateString('fr-FR', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            });
+            
+            const content = document.getElementById('modalContent');
+            let html = '';
+            
+            html += `
+            <div class="border-l-4 border-blue-500 pl-3 md:pl-4">
+                <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">Identité du patient</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 text-gray-700 text-sm md:text-base">
+                    <div><span class="font-medium">Nom:</span> ${observation.patientName}</div>
+                    <div><span class="font-medium">Âge/Sexe:</span> ${observation.patientAge} ans, ${observation.patientGender}</div>
+                    <div><span class="font-medium">Situation familiale:</span> ${observation.familySituation || 'Non spécifié'}</div>
+                    <div><span class="font-medium">Profession:</span> ${observation.profession || 'Non spécifié'}</div>
+                    <div class="md:col-span-2"><span class="font-medium">Service:</span> ${observation.hospitalService}</div>
+                    <div class="md:col-span-2"><span class="font-medium">Symptôme principal:</span> ${observation.mainSymptom}</div>
+                </div>
+            </div>
+            `;
+            
+            html += `
+            <div class="border-l-4 border-blue-500 pl-3 md:pl-4">
+                <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">Histoire de la maladie</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 text-gray-700 text-sm md:text-base">
+                    <div><span class="font-medium">Date d'apparition:</span> ${new Date(observation.symptomDate).toLocaleDateString('fr-FR')}</div>
+                    <div><span class="font-medium">Nature:</span> ${observation.symptomNature || 'Non spécifié'}</div>
+                    <div><span class="font-medium">Mode de début:</span> ${observation.symptomOnset || 'Non spécifié'}</div>
+                    <div><span class="font-medium">Facteurs déclenchants:</span> ${observation.triggerFactors || 'Non spécifié'}</div>
+                    <div><span class="font-medium">Facteurs calmants:</span> ${observation.reliefFactors || 'Non spécifié'}</div>
+                    <div class="md:col-span-2"><span class="font-medium">Symptômes associés:</span> ${observation.associatedSymptoms || 'Aucun'}</div>
+                </div>
+            </div>
+            `;
+            
+            html += `
+            <div class="border-l-4 border-blue-500 pl-3 md:pl-4">
+                <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">Antécédents</h4>
+                <div class="space-y-2 text-gray-700 text-sm md:text-base">
+                    <div><span class="font-medium">Personnels:</span> ${observation.personalHistory || 'Aucun'}</div>
+                    <div><span class="font-medium">Familiaux:</span> ${observation.familyHistory || 'Aucun'}</div>
+                    ${observation.patientGender === 'Féminin' && observation.gynecoHistory ? 
+                      `<div><span class="font-medium">Gynéco-obstétricaux:</span> ${observation.gynecoHistory}</div>` : ''}
+                </div>
+            </div>
+            `;
+            
+            html += `
+            <div class="border-l-4 border-blue-500 pl-3 md:pl-4">
+                <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">Examen général</h4>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 text-gray-700 text-sm md:text-base">
+                    <div><span class="font-medium">Conscience:</span> ${observation.consciousness}</div>
+                    <div><span class="font-medium">TA:</span> ${observation.bloodPressure || 'Non mesurée'}</div>
+                    <div><span class="font-medium">Pouls:</span> ${observation.pulse || 'Non mesuré'} bpm</div>
+                    <div><span class="font-medium">Température:</span> ${observation.temperature || 'Non mesurée'} °C</div>
+                    <div><span class="font-medium">Poids:</span> ${observation.weight || 'Non mesuré'} kg</div>
+                    <div><span class="font-medium">FR:</span> ${observation.respiratoryRate || 'Non mesurée'} cpm</div>
+                </div>
+            </div>
+            `;
+            
+            html += `
+            <div class="border-l-4 border-blue-500 pl-3 md:pl-4">
+                <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">Examens par appareil</h4>
+                <div class="space-y-2 md:space-y-3 text-gray-700 text-sm md:text-base">
+                    ${observation.respiratoryExam ? `<div><span class="font-medium">Respiratoire:</span> ${observation.respiratoryExam}</div>` : ''}
+                    ${observation.cardiovascularExam ? `<div><span class="font-medium">Cardio-vasculaire:</span> ${observation.cardiovascularExam}</div>` : ''}
+                    ${observation.digestiveExam ? `<div><span class="font-medium">Digestif:</span> ${observation.digestiveExam}</div>` : ''}
+                    ${observation.urinaryExam ? `<div><span class="font-medium">Urinaire:</span> ${observation.urinaryExam}</div>` : ''}
+                    ${observation.neurologicalExam ? `<div><span class="font-medium">Neurologique:</span> ${observation.neurologicalExam}</div>` : ''}
+                    ${observation.hematologicalExam ? `<div><span class="font-medium">Hématologique:</span> ${observation.hematologicalExam}</div>` : ''}
+                </div>
+            </div>
+            `;
+            
+            content.innerHTML = html;
+            
+            document.getElementById('observationDetailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('observationDetailModal').classList.add('hidden');
+        }
+
+        function editObservation() {
+            if (!appState.currentObservation) return;
+            
+            closeModal();
+            showNewObservation();
+            
+            const obs = appState.currentObservation;
+            appState.editingObservationId = obs.id;
+            
+            document.getElementById('patientName').value = obs.patientName;
+            document.getElementById('patientAge').value = obs.patientAge;
+            document.getElementById('patientGender').value = obs.patientGender;
+            document.getElementById('familySituation').value = obs.familySituation || '';
+            document.getElementById('childrenCount').value = obs.childrenCount || '';
+            document.getElementById('profession').value = obs.profession || '';
+            document.getElementById('hospitalService').value = obs.hospitalService;
+            document.getElementById('mainSymptom').value = obs.mainSymptom;
+            document.getElementById('symptomDate').value = obs.symptomDate;
+            document.getElementById('symptomNature').value = obs.symptomNature || '';
+            document.getElementById('symptomOnset').value = obs.symptomOnset || '';
+            document.getElementById('triggerFactors').value = obs.triggerFactors || '';
+            document.getElementById('reliefFactors').value = obs.reliefFactors || '';
+            document.getElementById('associatedSymptoms').value = obs.associatedSymptoms || '';
+            document.getElementById('personalHistory').value = obs.personalHistory || '';
+            document.getElementById('familyHistory').value = obs.familyHistory || '';
+            document.getElementById('gynecoHistory').value = obs.gynecoHistory || '';
+            document.getElementById('consciousness').value = obs.consciousness;
+            document.getElementById('bloodPressure').value = obs.bloodPressure || '';
+            document.getElementById('pulse').value = obs.pulse || '';
+            document.getElementById('temperature').value = obs.temperature || '';
+            document.getElementById('weight').value = obs.weight || '';
+            document.getElementById('respiratoryRate').value = obs.respiratoryRate || '';
+            document.getElementById('respiratoryExam').value = obs.respiratoryExam || '';
+            document.getElementById('cardiovascularExam').value = obs.cardiovascularExam || '';
+            document.getElementById('digestiveExam').value = obs.digestiveExam || '';
+            document.getElementById('urinaryExam').value = obs.urinaryExam || '';
+            document.getElementById('neurologicalExam').value = obs.neurologicalExam || '';
+            document.getElementById('hematologicalExam').value = obs.hematologicalExam || '';
+            
+            if (obs.patientGender === 'Féminin') {
+                document.getElementById('gynecoHistorySection').classList.remove('hidden');
+            }
+            
+            updateFormProgress();
+            
+            if (window.innerWidth < 768) {
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function deleteObservation(id) {
+            if (confirm('Voulez-vous vraiment supprimer cette observation ?')) {
+                appState.observations = appState.observations.filter(obs => obs.id !== id);
+                saveObservations();
+                showToast('Observation supprimée');
+            }
+        }
+
+        function printObservation() {
+            window.print();
+        }
+
+        function filterObservations() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const serviceFilter = document.getElementById('serviceFilter').value;
+            const symptomFilter = document.getElementById('symptomFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            const filtered = appState.observations.filter(obs => {
+                if (searchTerm && !obs.patientName.toLowerCase().includes(searchTerm) && 
+                    !obs.mainSymptom.toLowerCase().includes(searchTerm) &&
+                    !obs.hospitalService.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+                
+                if (serviceFilter && obs.hospitalService !== serviceFilter) {
+                    return false;
+                }
+                
+                if (symptomFilter && obs.mainSymptom !== symptomFilter) {
+                    return false;
+                }
+                
+                if (dateFilter) {
+                    const obsDate = new Date(obs.createdDate).toISOString().split('T')[0];
+                    if (obsDate !== dateFilter) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            renderObservations(filtered);
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('serviceFilter').value = '';
+            document.getElementById('symptomFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+            
+            renderObservations();
+        }
+
+        function updateStats() {
+            const total = appState.observations.length;
+            const today = new Date().toISOString().split('T')[0];
+            const todayCount = appState.observations.filter(obs => {
+                return obs.createdDate.split('T')[0] === today;
+            }).length;
+            const incompleteCount = appState.observations.filter(obs => obs.status === 'draft').length;
+            
+            document.getElementById('totalObservations').textContent = total;
+            document.getElementById('todayObservations').textContent = todayCount;
+            document.getElementById('incompleteObservations').textContent = incompleteCount;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
