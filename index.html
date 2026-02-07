@@ -6,6 +6,7 @@
     <title>Observation Médicale - Plateforme pour étudiants en médecine</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="media/stethoscope-solid-full.svg">
     <style>
         :root {
             --medical-blue: #1E88E5;
@@ -29,23 +30,6 @@
             border-left: 4px solid var(--medical-blue);
         }
 
-        .section-title {
-            position: relative;
-            padding-left: 16px;
-        }
-
-        .section-title::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 70%;
-            background-color: var(--medical-blue);
-            border-radius: 2px;
-        }
-
         .accordion-header {
             transition: all 0.3s ease;
             cursor: pointer;
@@ -56,7 +40,7 @@
         }
 
         .accordion-content {
-            max-height: 0px;
+            max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out;
         }
@@ -88,17 +72,52 @@
             box-shadow: 0 10px 15px -3px rgba(30, 136, 229, 0.1), 0 4px 6px -2px rgba(30, 136, 229, 0.05);
         }
 
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            
-            .print-visible {
-                display: block !important;
-            }
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .symptom-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .symptom-item:hover {
+            background-color: #e6f7ff;
+            border-color: #91d5ff;
+        }
+
+        .section-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background-color: var(--medical-blue);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .cloze-field {
+            display: inline-block;
+            min-width: 120px;
+            margin: 0 4px;
+            border-bottom: 2px dotted #4b5563;
         }
 
         @media (max-width: 768px) {
+            .checkbox-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            
             .mobile-btn {
                 padding: 10px 12px;
                 font-size: 14px;
@@ -112,26 +131,6 @@
             
             .mobile-stack {
                 flex-direction: column;
-            }
-            
-            .mobile-space-y > * {
-                margin-bottom: 12px;
-            }
-            
-            .mobile-space-y > *:last-child {
-                margin-bottom: 0;
-            }
-            
-            .mobile-text-center {
-                text-align: center;
-            }
-            
-            .mobile-p-4 {
-                padding: 1rem;
-            }
-            
-            .mobile-p-3 {
-                padding: 0.75rem;
             }
         }
     </style>
@@ -197,7 +196,7 @@
                 </div>
                 
                 <div class="bg-white rounded-xl p-4 md:p-6 medical-shadow">
-                    <div class="flex items-center justify-between">
+                    <div class="flex items center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm">À compléter</p>
                             <h3 id="incompleteObservations" class="text-2xl md:text-3xl font-bold text-gray-800 mt-1 md:mt-2">0</h3>
@@ -274,7 +273,7 @@
             <div class="bg-white rounded-xl p-4 md:p-6 medical-shadow mb-6 md:mb-8">
                 <div class="mb-4">
                     <h2 class="text-lg md:text-2xl font-bold text-gray-800 mb-2">Nouvelle observation médicale</h2>
-                    <p class="text-gray-600 text-sm md:text-base">Remplissez toutes les sections du formulaire</p>
+                    <p class="text-gray-600 text-sm md:text-base">Remplissez toutes les sections du formulaire selon le modèle standard</p>
                 </div>
                 
                 <div class="progress-bar mb-2">
@@ -282,254 +281,624 @@
                 </div>
                 <div class="flex justify-between text-xs md:text-sm text-gray-500">
                     <span id="progressText">0% complété</span>
-                    <span>Sections: <span id="completedSections">0</span>/5</span>
+                    <span>Sections: <span id="completedSections">0</span>/11</span>
                 </div>
             </div>
 
             <form id="observationForm" class="space-y-4 md:space-y-6">
                 <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
-                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="a">
-                        <div>
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">A. Identité du patient</h3>
-                            <p class="text-gray-600 text-sm">Informations démographiques et administratives</p>
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="1">
+                        <div class="flex items-center">
+                            <span class="section-indicator">1</span>
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">État Civil</h3>
+                                <p class="text-gray-600 text-sm">Identité et données administratives du patient</p>
+                            </div>
                         </div>
                         <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
                     </div>
                     
                     <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <div class="md:col-span-2">
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Nom complet *</label>
-                                <input type="text" id="patientName" name="patientName" required 
-                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                        <div class="space-y-4">
+                            <div class="text-gray-700 italic mb-4">
+                                <p>Il s'agit de <input type="text" id="patientName" name="patientName" class="cloze-field px-2 py-1 border-b-2 border-blue-500 focus:outline-none focus:border-blue-700" placeholder="Nom complet">,</p>
+                                <p>né(e) le <input type="date" id="birthDate" name="birthDate" class="cloze-field px-2 py-1 border-b-2 border-blue-500 focus:outline-none focus:border-blue-700">,</p>
+                                <p>âgé(e) de <input type="number" id="patientAge" name="patientAge" min="0" max="120" class="cloze-field px-2 py-1 border-b-2 border-blue-500 focus:outline-none focus:border-blue-700" placeholder="Âge"> ans,</p>
+                                <p>originaire de <input type="text" id="origin" name="origin" class="cloze-field px-2 py-1 border-b-2 border-blue-500 focus:outline-none focus:border-blue-700" placeholder="Lieu d'origine">,</p>
+                                <p>demeurant à <input type="text" id="address" name="address" class="cloze-field px-2 py-1 border-b-2 border-blue-500 focus:outline-none focus:border-blue-700" placeholder="Adresse">,</p>
                             </div>
                             
-                            <div class="grid grid-cols-2 gap-3 md:gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Âge *</label>
-                                    <input type="number" id="patientAge" name="patientAge" min="0" max="120" required 
-                                           class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                    <label class="block text-gray-700 mb-2">État civil</label>
+                                    <select id="civilStatus" name="civilStatus" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="célibataire">Célibataire</option>
+                                        <option value="marié(e)">Marié(e)</option>
+                                        <option value="divorcé(e)">Divorcé(e)</option>
+                                        <option value="veuf(ve)">Veuf(ve)</option>
+                                    </select>
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Sexe *</label>
-                                    <select id="patientGender" name="patientGender" required 
-                                            class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                    <label class="block text-gray-700 mb-2">Nombre d'enfants</label>
+                                    <input type="number" id="childrenCount" name="childrenCount" min="0" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" placeholder="0">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Profession</label>
+                                    <input type="text" id="profession" name="profession" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" placeholder="Profession actuelle">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Date d'hospitalisation</label>
+                                    <input type="date" id="hospitalizationDate" name="hospitalizationDate" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Service hospitalier</label>
+                                    <select id="hospitalService" name="hospitalService" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
                                         <option value="">Sélectionner</option>
-                                        <option value="Masculin">Masculin</option>
-                                        <option value="Féminin">Féminin</option>
-                                        <option value="Autre">Autre</option>
+                                        <option value="Cardiologie">Cardiologie</option>
+                                        <option value="Pneumologie">Pneumologie</option>
+                                        <option value="Gastro-entérologie">Gastro-entérologie</option>
+                                        <option value="Neurologie">Neurologie</option>
+                                        <option value="Urgences">Urgences</option>
+                                        <option value="Médecine interne">Médecine interne</option>
+                                        <option value="Chirurgie générale">Chirurgie générale</option>
+                                        <option value="Pédiatrie">Pédiatrie</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Symptôme majeur</label>
+                                    <input type="text" id="mainSymptom" name="mainSymptom" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" placeholder="Symptôme principal">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="2">
+                        <div class="flex items-center">
+                            <span class="section-indicator">2</span>
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">Histoire de la maladie</h3>
+                                <p class="text-gray-600 text-sm">Chronologie et caractéristiques des symptômes</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="space-y-4">
+                            <div class="text-gray-700 italic mb-4">
+                                <p>La symptomatologie remonte à <input type="date" id="symptomStartDate" name="symptomStartDate" class="cloze-field px-2 py-1 border-b-2 border-blue-500 focus:outline-none focus:border-blue-700">,</p>
+                                <p>marquée par l'apparition de <input type="text" id="symptomAppearance" name="symptomAppearance" class="cloze-field px-2 py-1 border-b-2 border-blue-500 focus:outline-none focus:border-blue-700" placeholder="Description des premiers symptômes">.</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Nature du symptôme</label>
+                                    <select id="symptomNature" name="symptomNature" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="aiguë">Aiguë</option>
+                                        <option value="chronique">Chronique</option>
+                                        <option value="intermittente">Intermittente</option>
+                                        <option value="progressive">Progressive</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Mode de début</label>
+                                    <select id="onsetMode" name="onsetMode" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="brutal">Brutal</option>
+                                        <option value="progressif">Progressif</option>
+                                        <option value="insidieux">Insidieux</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 mb-2">Facteurs déclenchants / sédatifs</label>
+                                    <textarea id="triggerFactors" name="triggerFactors" rows="2" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" placeholder="Facteurs qui déclenchent ou calment les symptômes..."></textarea>
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 mb-2">Symptômes associés (cochez les présents)</label>
+                                    <div class="checkbox-grid mt-2">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="associatedSymptoms" value="fièvre" class="mr-2">
+                                            <span>Fièvre</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="associatedSymptoms" value="frissons" class="mr-2">
+                                            <span>Frissons</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="associatedSymptoms" value="fatigue" class="mr-2">
+                                            <span>Fatigue</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="associatedSymptoms" value="anorexie" class="mr-2">
+                                            <span>Anorexie</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="associatedSymptoms" value="amaigrissement" class="mr-2">
+                                            <span>Amaigrissement</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="associatedSymptoms" value="nausées" class="mr-2">
+                                            <span>Nausées</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="associatedSymptoms" value="vomissements" class="mr-2">
+                                            <span>Vomissements</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="associatedSymptoms" value="céphalées" class="mr-2">
+                                            <span>Céphalées</span>
+                                        </label>
+                                    </div>
+                                    <input type="text" id="otherSymptoms" name="otherSymptoms" class="w-full mt-3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="Autres symptômes (séparés par des virgules)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="3">
+                        <div class="flex items-center">
+                            <span class="section-indicator">3</span>
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">Antécédents</h3>
+                                <p class="text-gray-600 text-sm">Personnels, familiaux et gynéco-obstétricaux</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Antécédents personnels</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Vaccinations</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="vaccinations" value="BCG" class="mr-2">
+                                            <span>BCG</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="vaccinations" value="DTP" class="mr-2">
+                                            <span>DTP</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="vaccinations" value="IDR" class="mr-2">
+                                            <span>IDR</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="vaccinations" value="autres" class="mr-2">
+                                            <span>Autres</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Allergies connues</label>
+                                    <input type="text" id="allergies" name="allergies" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" placeholder="Liste des allergies (médicaments, aliments, etc.)">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Maladies / Hospitalisations antérieures</label>
+                                    <textarea id="medicalHistory" name="medicalHistory" rows="3" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" placeholder="Maladies chroniques, interventions chirurgicales, hospitalisations..."></textarea>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Habitudes toxiques</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="toxicHabits" value="tabac" class="mr-2">
+                                            <span>Tabac</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="toxicHabits" value="alcool" class="mr-2">
+                                            <span>Alcool</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="toxicHabits" value="drogues" class="mr-2">
+                                            <span>Drogues</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="toxicHabits" value="médicaments" class="mr-2">
+                                            <span>Médicaments</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Antécédents familiaux</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">État des parents</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-gray-700 mb-1 text-sm">Père</label>
+                                            <input type="text" id="fatherStatus" name="fatherStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="Âge, état de santé, cause décès">
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 mb-1 text-sm">Mère</label>
+                                            <input type="text" id="motherStatus" name="motherStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="Âge, état de santé, cause décès">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Maladies familiales (cochez les présentes)</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="familyDiseases" value="HTA" class="mr-2">
+                                            <span>HTA</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="familyDiseases" value="diabète" class="mr-2">
+                                            <span>Diabète</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="familyDiseases" value="cancers" class="mr-2">
+                                            <span>Cancers</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="familyDiseases" value="cardiopathies" class="mr-2">
+                                            <span>Cardiopathies</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="familyDiseases" value="asthme" class="mr-2">
+                                            <span>Asthme/allergies</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="familyDiseases" value="autres" class="mr-2">
+                                            <span>Autres</span>
+                                        </label>
+                                    </div>
+                                    <input type="text" id="otherFamilyDiseases" name="otherFamilyDiseases" class="w-full mt-3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="Autres maladies familiales">
+                                </div>
+                            </div>
+                            
+                            <div id="gynecoSection" class="hidden">
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Antécédents gynéco-obstétricaux</h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Ménarchie</label>
+                                        <input type="number" id="menarcheAge" name="menarcheAge" min="8" max="20" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="Âge">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Ménopause</label>
+                                        <select id="menopauseStatus" name="menopauseStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                            <option value="">Sélectionner</option>
+                                            <option value="non">Non ménopausée</option>
+                                            <option value="oui">Ménopausée à ___ ans</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Caractère des cycles / Contraception</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cycleSymptoms" value="douleurs" class="mr-2">
+                                            <span>Douleurs</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cycleSymptoms" value="nausées" class="mr-2">
+                                            <span>Nausées</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cycleSymptoms" value="prise_poids" class="mr-2">
+                                            <span>Prise de poids</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cycleSymptoms" value="modifications_phanères" class="mr-2">
+                                            <span>Modifications phanères</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Anomalies du cycle menstruel</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cycleAnomalies" value="spanioménorrhée" class="mr-2">
+                                            <span>Spanioménorrhée</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cycleAnomalies" value="oligoménorrhée" class="mr-2">
+                                            <span>Oligoménorrhée</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cycleAnomalies" value="aménorrhée" class="mr-2">
+                                            <span>Aménorrhée</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cycleAnomalies" value="ménorragie" class="mr-2">
+                                            <span>Ménorragie</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cycleAnomalies" value="métrorragie" class="mr-2">
+                                            <span>Métrorragie</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Nombre de grossesses</label>
+                                        <input type="number" id="pregnanciesCount" name="pregnanciesCount" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Nombre d'accouchements</label>
+                                        <input type="number" id="deliveriesCount" name="deliveriesCount" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="4">
+                        <div class="flex items-center">
+                            <span class="section-indicator">4</span>
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">Contexte épidémiologique</h3>
+                                <p class="text-gray-600 text-sm">Facteurs environnementaux et sociaux</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Mode de vie</label>
+                                    <select id="lifestyle" name="lifestyle" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="sédentaire">Sédentaire</option>
+                                        <option value="actif">Actif</option>
+                                        <option value="sportif">Sportif</option>
+                                        <option value="profession_exposée">Profession exposée</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Niveau socio-économique</label>
+                                    <select id="socioEconomicLevel" name="socioEconomicLevel" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="faible">Faible</option>
+                                        <option value="moyen">Moyen</option>
+                                        <option value="élevé">Élevé</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Notion de contage tuberculeux</label>
+                                    <select id="tbExposure" name="tbExposure" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="non">Non</option>
+                                        <option value="possible">Possible</option>
+                                        <option value="certain">Certain</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Source d'eau</label>
+                                    <select id="waterSource" name="waterSource" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="robinet">Robinet (traitée)</option>
+                                        <option value="puit">Puit/Forage</option>
+                                        <option value="rivière">Rivière/Source</option>
+                                        <option value="eau_embouteillée">Eau embouteillée</option>
                                     </select>
                                 </div>
                             </div>
                             
                             <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Situation familiale</label>
-                                <select id="familySituation" name="familySituation" 
-                                        class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
-                                    <option value="">Sélectionner</option>
-                                    <option value="Célibataire">Célibataire</option>
-                                    <option value="Marié(e)">Marié(e)</option>
-                                    <option value="Divorcé(e)">Divorcé(e)</option>
-                                    <option value="Veuf(ve)">Veuf(ve)</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Nombre d'enfants</label>
-                                <input type="number" id="childrenCount" name="childrenCount" min="0" 
-                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Profession</label>
-                                <input type="text" id="profession" name="profession" 
-                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Service hospitalier *</label>
-                                <select id="hospitalService" name="hospitalService" required 
-                                        class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
-                                    <option value="">Sélectionner</option>
-                                    <option value="Cardiologie">Cardiologie</option>
-                                    <option value="Pneumologie">Pneumologie</option>
-                                    <option value="Gastro-entérologie">Gastro-entérologie</option>
-                                    <option value="Neurologie">Neurologie</option>
-                                    <option value="Urgences">Urgences</option>
-                                    <option value="Médecine interne">Médecine interne</option>
-                                    <option value="Chirurgie">Chirurgie</option>
-                                </select>
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Symptôme principal *</label>
-                                <input type="text" id="mainSymptom" name="mainSymptom" required 
-                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                       placeholder="Ex: Douleur thoracique, dyspnée, céphalée...">
+                                <label class="block text-gray-700 mb-2">Animaux domestiques / Exposition animale</label>
+                                <div class="checkbox-grid mt-2">
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="animals" value="chien" class="mr-2">
+                                        <span>Chien</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="animals" value="chat" class="mr-2">
+                                        <span>Chat</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="animals" value="oiseaux" class="mr-2">
+                                        <span>Oiseaux</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="animals" value="rongeurs" class="mr-2">
+                                        <span>Rongeurs</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="animals" value="animaux_ferme" class="mr-2">
+                                        <span>Animaux de ferme</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="animals" value="aucun" class="mr-2">
+                                        <span>Aucun</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
-                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="b">
-                        <div>
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">B. Histoire de la maladie</h3>
-                            <p class="text-gray-600 text-sm">Chronologie et caractéristiques des symptômes</p>
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="5">
+                        <div class="flex items-center">
+                            <span class="section-indicator">5</span>
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">État général du patient</h3>
+                                <p class="text-gray-600 text-sm">Conscience, orientation et signes généraux</p>
+                            </div>
                         </div>
                         <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
                     </div>
                     
                     <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Date d'apparition *</label>
-                                <input type="date" id="symptomDate" name="symptomDate" required 
-                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">État de conscience</label>
+                                    <select id="consciousness" name="consciousness" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="conscient">Conscient</option>
+                                        <option value="somnolent">Somnolent</option>
+                                        <option value="confus">Confus</option>
+                                        <option value="comateux">Comateux</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Coopération</label>
+                                    <select id="cooperation" name="cooperation" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="coopératif">Coopératif</option>
+                                        <option value="non_coopératif">Non coopératif</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Orientation temporo-spatiale</label>
+                                    <select id="orientation" name="orientation" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="bonne">Bonne</option>
+                                        <option value="altérée">Altérée</option>
+                                        <option value="absente">Absente</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Coloration cutanéo-muqueuse</label>
+                                    <select id="skinColor" name="skinColor" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="bonne">Bonne</option>
+                                        <option value="pâle">Pâle</option>
+                                        <option value="cyanotique">Cyanotique</option>
+                                        <option value="ictérique">Ictérique</option>
+                                    </select>
+                                </div>
                             </div>
                             
                             <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Nature du symptôme</label>
-                                <select id="symptomNature" name="symptomNature" 
-                                        class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
-                                    <option value="">Sélectionner</option>
-                                    <option value="Aiguë">Aiguë</option>
-                                    <option value="Chronique">Chronique</option>
-                                    <option value="Intermittente">Intermittente</option>
-                                    <option value="Progressive">Progressive</option>
-                                </select>
+                                <label class="block text-gray-700 mb-2">Posture</label>
+                                <div class="checkbox-grid mt-2">
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="posture" value="décubitus" class="mr-2">
+                                        <span>Décubitus</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="posture" value="assis" class="mr-2">
+                                        <span>Assis</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="posture" value="debout" class="mr-2">
+                                        <span>Debout</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="posture" value="antalgique" class="mr-2">
+                                        <span>Antalgique</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="posture" value="orthopnée" class="mr-2">
+                                        <span>Orthopnée</span>
+                                    </label>
+                                </div>
                             </div>
                             
                             <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Mode de début</label>
-                                <select id="symptomOnset" name="symptomOnset" 
-                                        class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
-                                    <option value="">Sélectionner</option>
-                                    <option value="Brutal">Brutal</option>
-                                    <option value="Progressif">Progressif</option>
-                                    <option value="Insidieux">Insidieux</option>
-                                </select>
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Facteurs déclenchants</label>
-                                <input type="text" id="triggerFactors" name="triggerFactors" 
-                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                       placeholder="Ex: Effort, stress, alimentation...">
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Facteurs calmants</label>
-                                <input type="text" id="reliefFactors" name="reliefFactors" 
-                                       class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                       placeholder="Ex: Repos, médicaments, position...">
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Symptômes associés</label>
-                                <textarea id="associatedSymptoms" name="associatedSymptoms" rows="3" 
-                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                          placeholder="Décrivez les autres symptômes associés..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
-                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="c">
-                        <div>
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">C. Antécédents</h3>
-                            <p class="text-gray-600 text-sm">Antécédents personnels, familiaux et gynéco-obstétricaux</p>
-                        </div>
-                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
-                    </div>
-                    
-                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
-                        <div class="space-y-4 md:space-y-6">
-                            <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Antécédents personnels</label>
-                                <textarea id="personalHistory" name="personalHistory" rows="3" 
-                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                          placeholder="Maladies, interventions chirurgicales, allergies, traitements en cours..."></textarea>
+                                <label class="block text-gray-700 mb-2">État de la peau</label>
+                                <div class="checkbox-grid mt-2">
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="skinCondition" value="normale" class="mr-2">
+                                        <span>Normale</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="skinCondition" value="sèche" class="mr-2">
+                                        <span>Sèche</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="skinCondition" value="lésions" class="mr-2">
+                                        <span>Lésions</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="skinCondition" value="oedèmes" class="mr-2">
+                                        <span>Œdèmes</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="skinCondition" value="déshydratation" class="mr-2">
+                                        <span>Déshydratation</span>
+                                    </label>
+                                </div>
+                                <input type="text" id="skinDetails" name="skinDetails" class="w-full mt-3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="Détails sur l'état de la peau">
                             </div>
                             
                             <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Antécédents familiaux</label>
-                                <textarea id="familyHistory" name="familyHistory" rows="3" 
-                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                          placeholder="Maladies héréditaires, cancers, pathologies cardiovasculaires..."></textarea>
+                                <label class="block text-gray-700 mb-2">Signes généraux (cochez les présents)</label>
+                                <div class="checkbox-grid mt-2">
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="generalSigns" value="asthénie" class="mr-2">
+                                        <span>Asthénie</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="generalSigns" value="angoisse" class="mr-2">
+                                        <span>Angoisse</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="generalSigns" value="anxiété" class="mr-2">
+                                        <span>Anxiété</span>
+                                    </label>
+                                    <label class="symptom-item">
+                                        <input type="checkbox" name="generalSigns" value="pâleur" class="mr-2">
+                                        <span>Pâleur</span>
+                                    </label>
+                                </div>
                             </div>
                             
-                            <div id="gynecoHistorySection" class="hidden">
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">Antécédents gynéco-obstétricaux</label>
-                                <textarea id="gynecoHistory" name="gynecoHistory" rows="3" 
-                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                          placeholder="Gestité, parité, contraception, dernières règles..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
-                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="d">
-                        <div>
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">D. Examen général</h3>
-                            <p class="text-gray-600 text-sm">État de conscience et constantes vitales</p>
-                        </div>
-                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
-                    </div>
-                    
-                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <div class="md:col-span-2">
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base">État de conscience *</label>
-                                <select id="consciousness" name="consciousness" required 
-                                        class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
-                                    <option value="">Sélectionner</option>
-                                    <option value="Conscient">Conscient</option>
-                                    <option value="Somnolent">Somnolent</option>
-                                    <option value="Confus">Confus</option>
-                                    <option value="Comateux">Comateux</option>
-                                </select>
-                            </div>
-                            
-                            <div class="md:col-span-2">
-                                <h4 class="text-md md:text-lg font-semibold text-gray-800 mb-4">Constantes vitales</h4>
+                            <div>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Constantes vitales</h4>
                                 <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
                                     <div>
-                                        <label class="block text-gray-700 mb-2 text-sm">TA (mmHg)</label>
-                                        <input type="text" id="bloodPressure" name="bloodPressure" 
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" 
-                                               placeholder="Ex: 120/80">
-                                    </div>
-                                    
-                                    <div>
                                         <label class="block text-gray-700 mb-2 text-sm">Pouls (bpm)</label>
-                                        <input type="number" id="pulse" name="pulse" min="20" max="200" 
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" 
-                                               placeholder="Ex: 72">
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-gray-700 mb-2 text-sm">Température (°C)</label>
-                                        <input type="number" id="temperature" name="temperature" min="34" max="42" step="0.1" 
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" 
-                                               placeholder="Ex: 37.2">
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-gray-700 mb-2 text-sm">Poids (kg)</label>
-                                        <input type="number" id="weight" name="weight" min="0" max="300" 
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" 
-                                               placeholder="Ex: 70">
+                                        <input type="number" id="pulse" name="pulse" min="20" max="200" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
                                     </div>
                                     
                                     <div>
                                         <label class="block text-gray-700 mb-2 text-sm">FR (cpm)</label>
-                                        <input type="number" id="respiratoryRate" name="respiratoryRate" min="8" max="50" 
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" 
-                                               placeholder="Ex: 16">
+                                        <input type="number" id="respiratoryRate" name="respiratoryRate" min="8" max="50" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2 text-sm">P.A (mmHg)</label>
+                                        <input type="text" id="bloodPressure" name="bloodPressure" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="120/80">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2 text-sm">Température (°C)</label>
+                                        <input type="number" id="temperature" name="temperature" min="34" max="42" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2 text-sm">Poids (kg)</label>
+                                        <input type="number" id="weight" name="weight" min="0" max="300" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
                                     </div>
                                 </div>
                             </div>
@@ -538,56 +907,710 @@
                 </div>
 
                 <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
-                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="e">
-                        <div>
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">E. Examens par appareil</h3>
-                            <p class="text-gray-600 text-sm">Examen clinique systématique</p>
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="6">
+                        <div class="flex items-center">
+                            <span class="section-indicator">6</span>
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">Examen pleuro-pulmonaire</h3>
+                                <p class="text-gray-600 text-sm">Signes fonctionnels et physiques respiratoires</p>
+                            </div>
                         </div>
                         <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
                     </div>
                     
                     <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
-                        <div class="space-y-4 md:space-y-6">
+                        <div class="space-y-6">
                             <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil respiratoire</label>
-                                <textarea id="respiratoryExam" name="respiratoryExam" rows="2" 
-                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                          placeholder="Auscultation, percussion, toux, expectoration..."></textarea>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Signes fonctionnels</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Dyspnée</label>
+                                    <select id="dyspnea" name="dyspnea" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="absente">Absente</option>
+                                        <option value="d_effort">À l'effort</option>
+                                        <option value="permanente">Permanente</option>
+                                        <option value="orthopnée">Orthopnée</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Toux</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cough" value="sèche" class="mr-2">
+                                            <span>Sèche</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cough" value="productive" class="mr-2">
+                                            <span>Productive</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cough" value="grasse" class="mr-2">
+                                            <span>Grasse</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cough" value="quinteuse" class="mr-2">
+                                            <span>Quinteuse</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Expectoration</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-gray-700 mb-1 text-sm">Couleur</label>
+                                            <select id="sputumColor" name="sputumColor" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                                <option value="">Sélectionner</option>
+                                                <option value="blanche">Blanche</option>
+                                                <option value="jaune">Jaune</option>
+                                                <option value="verte">Verte</option>
+                                                <option value="rouillée">Rouillée</option>
+                                                <option value="sanglante">Sanglante</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 mb-1 text-sm">Abondance</label>
+                                            <select id="sputumAmount" name="sputumAmount" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                                <option value="">Sélectionner</option>
+                                                <option value="minime">Minime</option>
+                                                <option value="modérée">Modérée</option>
+                                                <option value="abondante">Abondante</option>
+                                                <option value="très_abondante">Très abondante</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil cardio-vasculaire</label>
-                                <textarea id="cardiovascularExam" name="cardiovascularExam" rows="2" 
-                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                          placeholder="Bruits du cœur, pouls, œdèmes, turgescence jugulaire..."></textarea>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Signes physiques</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Inspection thoracique</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="thoracicInspection" value="forme_normale" class="mr-2">
+                                            <span>Forme normale</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="thoracicInspection" value="entonnoir" class="mr-2">
+                                            <span>Thorax en entonnoir</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="thoracicInspection" value="tonneau" class="mr-2">
+                                            <span>Thorax en tonneau</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="thoracicInspection" value="cyphoscoliose" class="mr-2">
+                                            <span>Cyphoscoliose</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="thoracicInspection" value="asymétrie" class="mr-2">
+                                            <span>Asymétrie</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Auscultation pulmonaire</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lungAuscultation" value="murmure_vésiculaire_normal" class="mr-2">
+                                            <span>Murmure vésiculaire normal</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lungAuscultation" value="râles_crépitants" class="mr-2">
+                                            <span>Râles crépitants</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lungAuscultation" value="râles_sibilants" class="mr-2">
+                                            <span>Râles sibilants</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lungAuscultation" value="souffles" class="mr-2">
+                                            <span>Souffles</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lungAuscultation" value="frottement" class="mr-2">
+                                            <span>Frottement</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="7">
+                        <div class="flex items-center">
+                            <span class="section-indicator">7</span>
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">Examen cardio-vasculaire</h3>
+                                <p class="text-gray-600 text-sm">Signes fonctionnels et physiques cardiaques</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Signes fonctionnels</h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Dyspnée (classification NYHA)</label>
+                                        <select id="cardiacDyspnea" name="cardiacDyspnea" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                            <option value="">Sélectionner</option>
+                                            <option value="I">Classe I (à l'effort important)</option>
+                                            <option value="II">Classe II (à l'effort modéré)</option>
+                                            <option value="III">Classe III (à l'effort léger)</option>
+                                            <option value="IV">Classe IV (au repos)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Palpitations</label>
+                                        <select id="palpitations" name="palpitations" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                            <option value="">Sélectionner</option>
+                                            <option value="absentes">Absentes</option>
+                                            <option value="occasionnelles">Occasionnelles</option>
+                                            <option value="fréquentes">Fréquentes</option>
+                                            <option value="permanentes">Permanentes</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Douleurs thoraciques</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="chestPain" value="angor" class="mr-2">
+                                            <span>Type angor</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="chestPain" value="constrictive" class="mr-2">
+                                            <span>Constrictive</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="chestPain" value="irradiation" class="mr-2">
+                                            <span>Avec irradiation</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="chestPain" value="effort" class="mr-2">
+                                            <span>À l'effort</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="chestPain" value="repos" class="mr-2">
+                                            <span>Au repos</span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil digestif</label>
-                                <textarea id="digestiveExam" name="digestiveExam" rows="2" 
-                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                          placeholder="Abdomen, foie, rate, transit, selles..."></textarea>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Signes physiques</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Inspection cardiaque</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cardiacInspection" value="cvc" class="mr-2">
+                                            <span>CVC</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cardiacInspection" value="voussure" class="mr-2">
+                                            <span>Voussure</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cardiacInspection" value="turgescence_jugulaire" class="mr-2">
+                                            <span>Turgescence jugulaire</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cardiacInspection" value="oedèmes_membres" class="mr-2">
+                                            <span>Œdèmes membres inférieurs</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Auscultation cardiaque</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cardiacAuscultation" value="rythme_régulier" class="mr-2">
+                                            <span>Rythme régulier</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cardiacAuscultation" value="souffle" class="mr-2">
+                                            <span>Souffle</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cardiacAuscultation" value="bruit_galop" class="mr-2">
+                                            <span>Bruit de galop</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="cardiacAuscultation" value="frottement" class="mr-2">
+                                            <span>Frottement péricardique</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="8">
+                        <div class="flex items-center">
+                            <span class="section-indicator">8</span>
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">Examen digestif</h3>
+                                <p class="text-gray-600 text-sm">Signes fonctionnels et examen abdominal</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Signes fonctionnels</h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Troubles de l'appétit</label>
+                                        <select id="appetite" name="appetite" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                            <option value="">Sélectionner</option>
+                                            <option value="normal">Normal</option>
+                                            <option value="anorexie">Anorexie</option>
+                                            <option value="polyphagie">Polyphagie</option>
+                                            <option value="dysphagie">Dysphagie</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Troubles du transit</label>
+                                        <select id="transit" name="transit" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                            <option value="">Sélectionner</option>
+                                            <option value="normal">Normal</option>
+                                            <option value="diarrhée">Diarrhée</option>
+                                            <option value="constipation">Constipation</option>
+                                            <option value="alternance">Alternance</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Douleurs abdominales</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPain" value="crampes" class="mr-2">
+                                            <span>Crampes</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPain" value="brûlures" class="mr-2">
+                                            <span>Brûlures</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPain" value="coliques" class="mr-2">
+                                            <span>Coliques</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPain" value="pesanteur" class="mr-2">
+                                            <span>Pesanteur</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPain" value="localisée" class="mr-2">
+                                            <span>Localisée</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPain" value="diffuse" class="mr-2">
+                                            <span>Diffuse</span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil urinaire</label>
-                                <textarea id="urinaryExam" name="urinaryExam" rows="2" 
-                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                          placeholder="Douleurs lombaires, brûlures mictionnelles, diurèse..."></textarea>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Examen physique</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Inspection abdominale</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalInspection" value="plat" class="mr-2">
+                                            <span>Abdomen plat</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalInspection" value="distendu" class="mr-2">
+                                            <span>Distendu</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalInspection" value="cicatrices" class="mr-2">
+                                            <span>Cicatrices</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalInspection" value="hernie" class="mr-2">
+                                            <span>Hernie</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalInspection" value="ondulations" class="mr-2">
+                                            <span>Ondulations péristaltiques</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Palpation abdominale</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPalpation" value="souple" class="mr-2">
+                                            <span>Paroi souple</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPalpation" value="douloureuse" class="mr-2">
+                                            <span>Douloureuse</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPalpation" value="défense" class="mr-2">
+                                            <span>Défense pariétale</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPalpation" value="contracture" class="mr-2">
+                                            <span>Contracture</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPalpation" value="hépatomégalie" class="mr-2">
+                                            <span>Hépatomégalie</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="abdominalPalpation" value="splénomégalie" class="mr-2">
+                                            <span>Splénomégalie</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="9">
+                        <div class="flex items-center">
+                            <span class="section-indicator">9</span>
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">Examen urinaire</h3>
+                                <p class="text-gray-600 text-sm">Signes fonctionnels et examen urologique</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Signes fonctionnels</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Symptômes urinaires</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="urinarySymptoms" value="douleurs_lombaires" class="mr-2">
+                                            <span>Douleurs lombaires</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="urinarySymptoms" value="brûlures_mictionnelles" class="mr-2">
+                                            <span>Brûlures mictionnelles</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="urinarySymptoms" value="dysurie" class="mr-2">
+                                            <span>Dysurie</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="urinarySymptoms" value="pollakiurie" class="mr-2">
+                                            <span>Pollakiurie</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="urinarySymptoms" value="oligurie" class="mr-2">
+                                            <span>Oligurie</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="urinarySymptoms" value="hématurie" class="mr-2">
+                                            <span>Hématurie</span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil neurologique</label>
-                                <textarea id="neurologicalExam" name="neurologicalExam" rows="2" 
-                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                          placeholder="Motricité, sensibilité, réflexes, coordination..."></textarea>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Examen physique</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Examen des fosses lombaires</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lumbarExam" value="douloureux" class="mr-2">
+                                            <span>Contact lombaire douloureux</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lumbarExam" value="ballonnement_rénal" class="mr-2">
+                                            <span>Ballonnement rénal</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lumbarExam" value="signe_giordano" class="mr-2">
+                                            <span>Signe de Giordano (+)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Examen de la région hypogastrique</label>
+                                    <select id="hypogastricExam" name="hypogastricExam" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="souple_indolore">Souple et indolore</option>
+                                        <option value="douloureuse">Douloureuse</option>
+                                        <option value="globevésicale">Globe vésical</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="10">
+                        <div class="flex items-center">
+                            <span class="section-indicator">10</span>
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">Examen neurologique</h3>
+                                <p class="text-gray-600 text-sm">État mental, motricité, sensibilité et réflexes</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">État mental</h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Orientation</label>
+                                        <select id="neurologicalOrientation" name="neurologicalOrientation" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                            <option value="">Sélectionner</option>
+                                            <option value="bonne">Bonne (temps, espace, personnes)</option>
+                                            <option value="altérée">Altérée</option>
+                                            <option value="absente">Absente</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Troubles de la mémoire</label>
+                                        <select id="memory" name="memory" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                            <option value="">Sélectionner</option>
+                                            <option value="normale">Normale</option>
+                                            <option value="troubles_récents">Troubles récents</option>
+                                            <option value="troubles_anciens">Troubles anciens</option>
+                                            <option value="troubles_globaux">Troubles globaux</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div>
-                                <label class="block text-gray-700 mb-2 text-sm md:text-base font-medium">Appareil hématologique</label>
-                                <textarea id="hematologicalExam" name="hematologicalExam" rows="2" 
-                                          class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base" 
-                                          placeholder="Pâleur, ictère, ecchymoses, adénopathies..."></textarea>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Examen physique</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Motricité</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="motricity" value="normale" class="mr-2">
+                                            <span>Normale</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="motricity" value="parésie" class="mr-2">
+                                            <span>Parésie</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="motricity" value="paralysie" class="mr-2">
+                                            <span>Paralysie</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="motricity" value="tremblements" class="mr-2">
+                                            <span>Tremblements</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="motricity" value="rigidité" class="mr-2">
+                                            <span>Rigidité</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Réflexes ostéo-tendineux</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="reflexes" value="styloradial_normal" class="mr-2">
+                                            <span>Stylo-radial normal</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="reflexes" value="bicipital_normal" class="mr-2">
+                                            <span>Bicipital normal</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="reflexes" value="rotulien_normal" class="mr-2">
+                                            <span>Rotulien normal</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="reflexes" value="achilléen_normal" class="mr-2">
+                                            <span>Achilléen normal</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="reflexes" value="abolition" class="mr-2">
+                                            <span>Abolition</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="reflexes" value="exagération" class="mr-2">
+                                            <span>Exagération</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Signe de Babinski</label>
+                                    <select id="babinski" name="babinski" class="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                                        <option value="">Sélectionner</option>
+                                        <option value="négatif">Négatif</option>
+                                        <option value="positif_droit">Positif à droite</option>
+                                        <option value="positif_gauche">Positif à gauche</option>
+                                        <option value="positif_bilatéral">Positif bilatéral</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section bg-white rounded-xl medical-shadow overflow-hidden">
+                    <div class="accordion-header p-4 md:p-6 flex justify-between items-center" data-section="11">
+                        <div class="flex items-center">
+                            <span class="section-indicator">11</span>
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-1">Examen hématologique</h3>
+                                <p class="text-gray-600 text-sm">Signes d'anémie, hémorragies et adénopathies</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-lg transition-transform"></i>
+                    </div>
+                    
+                    <div class="accordion-content px-4 md:px-6 pb-4 md:pb-6">
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Signes fonctionnels</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Syndrome anémique</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="anemicSyndrome" value="asthénie" class="mr-2">
+                                            <span>Asthénie</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="anemicSyndrome" value="vertiges" class="mr-2">
+                                            <span>Vertiges</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="anemicSyndrome" value="dyspnée_effort" class="mr-2">
+                                            <span>Dyspnée d'effort</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="anemicSyndrome" value="palpitations" class="mr-2">
+                                            <span>Palpitations</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="anemicSyndrome" value="bourdonnements" class="mr-2">
+                                            <span>Bourdonnements d'oreille</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Hémorragies extériorisées</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="hemorrhages" value="gingivorragie" class="mr-2">
+                                            <span>Gingivorragie</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="hemorrhages" value="épistaxis" class="mr-2">
+                                            <span>Épistaxis</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="hemorrhages" value="ecchymoses" class="mr-2">
+                                            <span>Ecchymoses</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="hemorrhages" value="pétéchies" class="mr-2">
+                                            <span>Pétéchies</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="hemorrhages" value="hématurie" class="mr-2">
+                                            <span>Hématurie</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-md font-bold text-gray-800 mb-3">Signes physiques</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Inspection</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="hematologicalInspection" value="pâleur" class="mr-2">
+                                            <span>Pâleur cutanéo-muqueuse</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="hematologicalInspection" value="ictère" class="mr-2">
+                                            <span>Ictère</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="hematologicalInspection" value="adénopathies" class="mr-2">
+                                            <span>Adénopathies</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="hematologicalInspection" value="splénomégalie" class="mr-2">
+                                            <span>Splénomégalie</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Examen des aires ganglionnaires</label>
+                                    <div class="checkbox-grid">
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lymphNodes" value="cervicales" class="mr-2">
+                                            <span>Cervicales</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lymphNodes" value="axillaires" class="mr-2">
+                                            <span>Axillaires</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lymphNodes" value="inguinales" class="mr-2">
+                                            <span>Inguinales</span>
+                                        </label>
+                                        <label class="symptom-item">
+                                            <input type="checkbox" name="lymphNodes" value="aucune" class="mr-2">
+                                            <span>Aucune</span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -693,16 +1716,22 @@
             
             updateStats();
             
-            document.getElementById('symptomDate').valueAsDate = new Date();
+            const today = new Date();
+            document.getElementById('birthDate').valueAsDate = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
+            document.getElementById('hospitalizationDate').valueAsDate = today;
+            document.getElementById('symptomStartDate').valueAsDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
             
-            document.getElementById('patientGender').addEventListener('change', function() {
-                const gynecoSection = document.getElementById('gynecoHistorySection');
-                if (this.value === 'Féminin') {
-                    gynecoSection.classList.remove('hidden');
-                } else {
-                    gynecoSection.classList.add('hidden');
-                }
-            });
+            const patientGender = document.getElementById('patientGender');
+            if (patientGender) {
+                patientGender.addEventListener('change', function() {
+                    const gynecoSection = document.getElementById('gynecoSection');
+                    if (this.value === 'Féminin') {
+                        gynecoSection.classList.remove('hidden');
+                    } else {
+                        gynecoSection.classList.add('hidden');
+                    }
+                });
+            }
             
             document.querySelectorAll('#observationForm input, #observationForm select, #observationForm textarea').forEach(element => {
                 element.addEventListener('input', updateFormProgress);
@@ -770,7 +1799,6 @@
 
         function autoSaveDraft() {
             if (appState.currentPage === 'newObservation' && appState.editingObservationId === null) {
-                const form = document.getElementById('observationForm');
                 const patientName = document.getElementById('patientName').value;
                 
                 if (patientName.trim() !== '') {
@@ -816,8 +1844,14 @@
 
         function updateFormProgress() {
             const requiredFields = document.querySelectorAll('#observationForm [required]');
-            const filledRequiredFields = Array.from(requiredFields).filter(field => field.value.trim() !== '').length;
-            const progress = Math.round((filledRequiredFields / requiredFields.length) * 100);
+            const filledRequiredFields = Array.from(requiredFields).filter(field => {
+                if (field.type === 'checkbox') {
+                    return field.checked;
+                }
+                return field.value.trim() !== '';
+            }).length;
+            
+            const progress = requiredFields.length > 0 ? Math.round((filledRequiredFields / requiredFields.length) * 100) : 0;
             
             document.getElementById('formProgress').style.width = `${progress}%`;
             document.getElementById('progressText').textContent = `${progress}% complété`;
@@ -828,8 +1862,14 @@
             sections.forEach(section => {
                 const requiredInSection = section.querySelectorAll('[required]');
                 if (requiredInSection.length > 0) {
-                    const filledInSection = Array.from(requiredInSection).filter(field => field.value.trim() !== '').length;
-                    if (filledInSection === requiredInSection.length) {
+                    const filledInSection = Array.from(requiredInSection).filter(field => {
+                        if (field.type === 'checkbox') {
+                            return field.checked;
+                        }
+                        return field.value.trim() !== '';
+                    }).length;
+                    
+                    if (filledInSection > 0) {
                         completedSections++;
                     }
                 }
@@ -854,11 +1894,12 @@
             
             document.getElementById('observationForm').reset();
             
-            document.getElementById('gynecoHistorySection').classList.add('hidden');
+            document.getElementById('gynecoSection').classList.add('hidden');
             
             const today = new Date();
-            const formattedDate = today.toISOString().split('T')[0];
-            document.getElementById('symptomDate').value = formattedDate;
+            document.getElementById('birthDate').valueAsDate = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
+            document.getElementById('hospitalizationDate').valueAsDate = today;
+            document.getElementById('symptomStartDate').valueAsDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
             
             closeAllAccordions();
             
@@ -909,49 +1950,116 @@
             
             saveObservations();
             showToast('Brouillon enregistré');
+            
             if (window.innerWidth >= 768) {
                 showDashboard();
             }
         }
 
         function cancelObservation() {
-            if (confirm('Voulez-vous vraiment annuler? Les modifications non enregistrées seront perdues.')) {
+            if (confirm('Voulez-vous vraiment annuler ? Les modifications non enregistrées seront perdues.')) {
                 showDashboard();
             }
         }
 
         function gatherFormData() {
-            return {
-                patientName: document.getElementById('patientName').value,
-                patientAge: document.getElementById('patientAge').value,
-                patientGender: document.getElementById('patientGender').value,
-                familySituation: document.getElementById('familySituation').value,
-                childrenCount: document.getElementById('childrenCount').value,
-                profession: document.getElementById('profession').value,
-                hospitalService: document.getElementById('hospitalService').value,
-                mainSymptom: document.getElementById('mainSymptom').value,
-                symptomDate: document.getElementById('symptomDate').value,
-                symptomNature: document.getElementById('symptomNature').value,
-                symptomOnset: document.getElementById('symptomOnset').value,
-                triggerFactors: document.getElementById('triggerFactors').value,
-                reliefFactors: document.getElementById('reliefFactors').value,
-                associatedSymptoms: document.getElementById('associatedSymptoms').value,
-                personalHistory: document.getElementById('personalHistory').value,
-                familyHistory: document.getElementById('familyHistory').value,
-                gynecoHistory: document.getElementById('patientGender').value === 'Féminin' ? document.getElementById('gynecoHistory').value : '',
-                consciousness: document.getElementById('consciousness').value,
-                bloodPressure: document.getElementById('bloodPressure').value,
-                pulse: document.getElementById('pulse').value,
-                temperature: document.getElementById('temperature').value,
-                weight: document.getElementById('weight').value,
-                respiratoryRate: document.getElementById('respiratoryRate').value,
-                respiratoryExam: document.getElementById('respiratoryExam').value,
-                cardiovascularExam: document.getElementById('cardiovascularExam').value,
-                digestiveExam: document.getElementById('digestiveExam').value,
-                urinaryExam: document.getElementById('urinaryExam').value,
-                neurologicalExam: document.getElementById('neurologicalExam').value,
-                hematologicalExam: document.getElementById('hematologicalExam').value
-            };
+            const observation = {};
+            
+            observation.patientName = document.getElementById('patientName').value;
+            observation.birthDate = document.getElementById('birthDate').value;
+            observation.patientAge = document.getElementById('patientAge').value;
+            observation.origin = document.getElementById('origin').value;
+            observation.address = document.getElementById('address').value;
+            observation.civilStatus = document.getElementById('civilStatus').value;
+            observation.childrenCount = document.getElementById('childrenCount').value;
+            observation.profession = document.getElementById('profession').value;
+            observation.hospitalizationDate = document.getElementById('hospitalizationDate').value;
+            observation.hospitalService = document.getElementById('hospitalService').value;
+            observation.mainSymptom = document.getElementById('mainSymptom').value;
+            
+            observation.symptomStartDate = document.getElementById('symptomStartDate').value;
+            observation.symptomAppearance = document.getElementById('symptomAppearance').value;
+            observation.symptomNature = document.getElementById('symptomNature').value;
+            observation.onsetMode = document.getElementById('onsetMode').value;
+            observation.triggerFactors = document.getElementById('triggerFactors').value;
+            
+            observation.associatedSymptoms = Array.from(document.querySelectorAll('input[name="associatedSymptoms"]:checked')).map(cb => cb.value);
+            observation.otherSymptoms = document.getElementById('otherSymptoms').value;
+            
+            observation.vaccinations = Array.from(document.querySelectorAll('input[name="vaccinations"]:checked')).map(cb => cb.value);
+            observation.allergies = document.getElementById('allergies').value;
+            observation.medicalHistory = document.getElementById('medicalHistory').value;
+            observation.toxicHabits = Array.from(document.querySelectorAll('input[name="toxicHabits"]:checked')).map(cb => cb.value);
+            observation.fatherStatus = document.getElementById('fatherStatus').value;
+            observation.motherStatus = document.getElementById('motherStatus').value;
+            observation.familyDiseases = Array.from(document.querySelectorAll('input[name="familyDiseases"]:checked')).map(cb => cb.value);
+            observation.otherFamilyDiseases = document.getElementById('otherFamilyDiseases').value;
+            
+            const patientGender = document.getElementById('patientGender').value;
+            if (patientGender === 'Féminin') {
+                observation.menarcheAge = document.getElementById('menarcheAge').value;
+                observation.menopauseStatus = document.getElementById('menopauseStatus').value;
+                observation.cycleSymptoms = Array.from(document.querySelectorAll('input[name="cycleSymptoms"]:checked')).map(cb => cb.value);
+                observation.cycleAnomalies = Array.from(document.querySelectorAll('input[name="cycleAnomalies"]:checked')).map(cb => cb.value);
+                observation.pregnanciesCount = document.getElementById('pregnanciesCount').value;
+                observation.deliveriesCount = document.getElementById('deliveriesCount').value;
+            }
+            
+            observation.lifestyle = document.getElementById('lifestyle').value;
+            observation.socioEconomicLevel = document.getElementById('socioEconomicLevel').value;
+            observation.tbExposure = document.getElementById('tbExposure').value;
+            observation.waterSource = document.getElementById('waterSource').value;
+            observation.animals = Array.from(document.querySelectorAll('input[name="animals"]:checked')).map(cb => cb.value);
+            
+            observation.consciousness = document.getElementById('consciousness').value;
+            observation.cooperation = document.getElementById('cooperation').value;
+            observation.orientation = document.getElementById('orientation').value;
+            observation.skinColor = document.getElementById('skinColor').value;
+            observation.posture = Array.from(document.querySelectorAll('input[name="posture"]:checked')).map(cb => cb.value);
+            observation.skinCondition = Array.from(document.querySelectorAll('input[name="skinCondition"]:checked')).map(cb => cb.value);
+            observation.skinDetails = document.getElementById('skinDetails').value;
+            observation.generalSigns = Array.from(document.querySelectorAll('input[name="generalSigns"]:checked')).map(cb => cb.value);
+            observation.pulse = document.getElementById('pulse').value;
+            observation.respiratoryRate = document.getElementById('respiratoryRate').value;
+            observation.bloodPressure = document.getElementById('bloodPressure').value;
+            observation.temperature = document.getElementById('temperature').value;
+            observation.weight = document.getElementById('weight').value;
+            
+            observation.dyspnea = document.getElementById('dyspnea').value;
+            observation.cough = Array.from(document.querySelectorAll('input[name="cough"]:checked')).map(cb => cb.value);
+            observation.sputumColor = document.getElementById('sputumColor').value;
+            observation.sputumAmount = document.getElementById('sputumAmount').value;
+            observation.thoracicInspection = Array.from(document.querySelectorAll('input[name="thoracicInspection"]:checked')).map(cb => cb.value);
+            observation.lungAuscultation = Array.from(document.querySelectorAll('input[name="lungAuscultation"]:checked')).map(cb => cb.value);
+            
+            observation.cardiacDyspnea = document.getElementById('cardiacDyspnea').value;
+            observation.palpitations = document.getElementById('palpitations').value;
+            observation.chestPain = Array.from(document.querySelectorAll('input[name="chestPain"]:checked')).map(cb => cb.value);
+            observation.cardiacInspection = Array.from(document.querySelectorAll('input[name="cardiacInspection"]:checked')).map(cb => cb.value);
+            observation.cardiacAuscultation = Array.from(document.querySelectorAll('input[name="cardiacAuscultation"]:checked')).map(cb => cb.value);
+            
+            observation.appetite = document.getElementById('appetite').value;
+            observation.transit = document.getElementById('transit').value;
+            observation.abdominalPain = Array.from(document.querySelectorAll('input[name="abdominalPain"]:checked')).map(cb => cb.value);
+            observation.abdominalInspection = Array.from(document.querySelectorAll('input[name="abdominalInspection"]:checked')).map(cb => cb.value);
+            observation.abdominalPalpation = Array.from(document.querySelectorAll('input[name="abdominalPalpation"]:checked')).map(cb => cb.value);
+            
+            observation.urinarySymptoms = Array.from(document.querySelectorAll('input[name="urinarySymptoms"]:checked')).map(cb => cb.value);
+            observation.lumbarExam = Array.from(document.querySelectorAll('input[name="lumbarExam"]:checked')).map(cb => cb.value);
+            observation.hypogastricExam = document.getElementById('hypogastricExam').value;
+            
+            observation.neurologicalOrientation = document.getElementById('neurologicalOrientation').value;
+            observation.memory = document.getElementById('memory').value;
+            observation.motricity = Array.from(document.querySelectorAll('input[name="motricity"]:checked')).map(cb => cb.value);
+            observation.reflexes = Array.from(document.querySelectorAll('input[name="reflexes"]:checked')).map(cb => cb.value);
+            observation.babinski = document.getElementById('babinski').value;
+            
+            observation.anemicSyndrome = Array.from(document.querySelectorAll('input[name="anemicSyndrome"]:checked')).map(cb => cb.value);
+            observation.hemorrhages = Array.from(document.querySelectorAll('input[name="hemorrhages"]:checked')).map(cb => cb.value);
+            observation.hematologicalInspection = Array.from(document.querySelectorAll('input[name="hematologicalInspection"]:checked')).map(cb => cb.value);
+            observation.lymphNodes = Array.from(document.querySelectorAll('input[name="lymphNodes"]:checked')).map(cb => cb.value);
+            
+            return observation;
         }
 
         function renderObservations(filteredObservations = null) {
@@ -970,7 +2078,7 @@
             
             let html = '';
             observations.forEach(obs => {
-                const date = new Date(obs.createdDate).toLocaleDateString('fr-FR');
+                const date = obs.createdDate ? new Date(obs.createdDate).toLocaleDateString('fr-FR') : 'Date inconnue';
                 const statusClass = obs.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
                 const statusText = obs.status === 'completed' ? 'Complète' : 'Brouillon';
                 
@@ -978,20 +2086,20 @@
                 <div class="observation-card bg-white rounded-xl p-4 md:p-6 medical-shadow cursor-pointer" data-id="${obs.id}">
                     <div class="flex justify-between items-start mb-3 md:mb-4">
                         <div class="overflow-hidden">
-                            <h4 class="text-base md:text-lg font-bold text-gray-800 truncate">${obs.patientName}</h4>
-                            <p class="text-gray-600 text-xs md:text-sm">${obs.patientAge} ans, ${obs.patientGender}</p>
+                            <h4 class="text-base md:text-lg font-bold text-gray-800 truncate">${obs.patientName || 'Sans nom'}</h4>
+                            <p class="text-gray-600 text-xs md:text-sm">${obs.patientAge || '?'} ans, ${obs.hospitalService || 'Service non spécifié'}</p>
                         </div>
                         <span class="px-2 md:px-3 py-1 ${statusClass} rounded-full text-xs font-medium whitespace-nowrap">${statusText}</span>
                     </div>
                     
                     <div class="mb-3 md:mb-4">
                         <div class="flex items-center text-gray-700 mb-1 md:mb-2">
-                            <i class="fas fa-hospital mr-2 text-blue-500 text-xs md:text-sm"></i>
-                            <span class="text-xs md:text-sm truncate">${obs.hospitalService}</span>
+                            <i class="fas fa-stethoscope mr-2 text-blue-500 text-xs md:text-sm"></i>
+                            <span class="text-xs md:text-sm truncate">${obs.mainSymptom || 'Symptôme non spécifié'}</span>
                         </div>
                         <div class="flex items-center text-gray-700">
-                            <i class="fas fa-stethoscope mr-2 text-blue-500 text-xs md:text-sm"></i>
-                            <span class="text-xs md:text-sm truncate">${obs.mainSymptom}</span>
+                            <i class="fas fa-calendar-alt mr-2 text-blue-500 text-xs md:text-sm"></i>
+                            <span class="text-xs md:text-sm truncate">Hospitalisé le ${obs.hospitalizationDate ? new Date(obs.hospitalizationDate).toLocaleDateString('fr-FR') : 'date inconnue'}</span>
                         </div>
                     </div>
                     
@@ -1045,26 +2153,23 @@
             
             appState.currentObservation = observation;
             
-            document.getElementById('modalPatientName').textContent = observation.patientName;
-            document.getElementById('modalPatientAgeGender').textContent = `${observation.patientAge} ans, ${observation.patientGender}`;
-            document.getElementById('modalService').textContent = observation.hospitalService;
-            document.getElementById('modalDate').textContent = new Date(observation.createdDate).toLocaleDateString('fr-FR', {
+            document.getElementById('modalPatientName').textContent = observation.patientName || 'Sans nom';
+            document.getElementById('modalPatientAgeGender').textContent = `${observation.patientAge || '?'} ans`;
+            document.getElementById('modalService').textContent = observation.hospitalService || 'Non spécifié';
+            document.getElementById('modalDate').textContent = observation.createdDate ? new Date(observation.createdDate).toLocaleDateString('fr-FR', {
                 day: 'numeric', month: 'long', year: 'numeric'
-            });
+            }) : 'Date inconnue';
             
             const content = document.getElementById('modalContent');
             let html = '';
             
             html += `
             <div class="border-l-4 border-blue-500 pl-3 md:pl-4">
-                <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">Identité du patient</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 text-gray-700 text-sm md:text-base">
-                    <div><span class="font-medium">Nom:</span> ${observation.patientName}</div>
-                    <div><span class="font-medium">Âge/Sexe:</span> ${observation.patientAge} ans, ${observation.patientGender}</div>
-                    <div><span class="font-medium">Situation familiale:</span> ${observation.familySituation || 'Non spécifié'}</div>
-                    <div><span class="font-medium">Profession:</span> ${observation.profession || 'Non spécifié'}</div>
-                    <div class="md:col-span-2"><span class="font-medium">Service:</span> ${observation.hospitalService}</div>
-                    <div class="md:col-span-2"><span class="font-medium">Symptôme principal:</span> ${observation.mainSymptom}</div>
+                <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">État Civil</h4>
+                <div class="text-gray-700 text-sm md:text-base">
+                    <p>Il s'agit de <strong>${observation.patientName || 'Non renseigné'}</strong>, né(e) le <strong>${observation.birthDate ? new Date(observation.birthDate).toLocaleDateString('fr-FR') : 'Non renseigné'}</strong>, âgé(e) de <strong>${observation.patientAge || '?'} ans</strong>.</p>
+                    <p>Originaire de <strong>${observation.origin || 'Non renseigné'}</strong>, demeurant à <strong>${observation.address || 'Non renseigné'}</strong>, ${observation.civilStatus || ''}${observation.childrenCount ? `, père/mère de ${observation.childrenCount} enfants` : ''}.</p>
+                    <p>Profession: <strong>${observation.profession || 'Non renseigné'}</strong>. Hospitalisé(e) le <strong>${observation.hospitalizationDate ? new Date(observation.hospitalizationDate).toLocaleDateString('fr-FR') : 'Non renseigné'}</strong> au service de <strong>${observation.hospitalService || 'Non renseigné'}</strong> pour <strong>${observation.mainSymptom || 'Non renseigné'}</strong>.</p>
                 </div>
             </div>
             `;
@@ -1072,13 +2177,11 @@
             html += `
             <div class="border-l-4 border-blue-500 pl-3 md:pl-4">
                 <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">Histoire de la maladie</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 text-gray-700 text-sm md:text-base">
-                    <div><span class="font-medium">Date d'apparition:</span> ${new Date(observation.symptomDate).toLocaleDateString('fr-FR')}</div>
-                    <div><span class="font-medium">Nature:</span> ${observation.symptomNature || 'Non spécifié'}</div>
-                    <div><span class="font-medium">Mode de début:</span> ${observation.symptomOnset || 'Non spécifié'}</div>
-                    <div><span class="font-medium">Facteurs déclenchants:</span> ${observation.triggerFactors || 'Non spécifié'}</div>
-                    <div><span class="font-medium">Facteurs calmants:</span> ${observation.reliefFactors || 'Non spécifié'}</div>
-                    <div class="md:col-span-2"><span class="font-medium">Symptômes associés:</span> ${observation.associatedSymptoms || 'Aucun'}</div>
+                <div class="text-gray-700 text-sm md:text-base">
+                    <p>La symptomatologie remonte au <strong>${observation.symptomStartDate ? new Date(observation.symptomStartDate).toLocaleDateString('fr-FR') : 'Non renseigné'}</strong>, marquée par l'apparition de <strong>${observation.symptomAppearance || 'Non renseigné'}</strong>.</p>
+                    <p>Nature: ${observation.symptomNature || 'Non renseigné'}, Mode de début: ${observation.onsetMode || 'Non renseigné'}</p>
+                    <p>Facteurs déclenchants/sédatifs: ${observation.triggerFactors || 'Non renseigné'}</p>
+                    <p>Symptômes associés: ${observation.associatedSymptoms && observation.associatedSymptoms.length > 0 ? observation.associatedSymptoms.join(', ') : 'Aucun'}${observation.otherSymptoms ? `, ${observation.otherSymptoms}` : ''}</p>
                 </div>
             </div>
             `;
@@ -1086,46 +2189,47 @@
             html += `
             <div class="border-l-4 border-blue-500 pl-3 md:pl-4">
                 <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">Antécédents</h4>
-                <div class="space-y-2 text-gray-700 text-sm md:text-base">
-                    <div><span class="font-medium">Personnels:</span> ${observation.personalHistory || 'Aucun'}</div>
-                    <div><span class="font-medium">Familiaux:</span> ${observation.familyHistory || 'Aucun'}</div>
-                    ${observation.patientGender === 'Féminin' && observation.gynecoHistory ? 
-                      `<div><span class="font-medium">Gynéco-obstétricaux:</span> ${observation.gynecoHistory}</div>` : ''}
+                <div class="text-gray-700 text-sm md:text-base">
+                    <p><strong>Personnels:</strong> Vaccinations: ${observation.vaccinations && observation.vaccinations.length > 0 ? observation.vaccinations.join(', ') : 'Non renseigné'}. Allergies: ${observation.allergies || 'Aucune'}. Antécédents médicaux: ${observation.medicalHistory || 'Aucun'}. Habitudes toxiques: ${observation.toxicHabits && observation.toxicHabits.length > 0 ? observation.toxicHabits.join(', ') : 'Aucune'}.</p>
+                    <p><strong>Familiaux:</strong> État des parents: Père ${observation.fatherStatus || 'Non renseigné'}, Mère ${observation.motherStatus || 'Non renseigné'}. Maladies familiales: ${observation.familyDiseases && observation.familyDiseases.length > 0 ? observation.familyDiseases.join(', ') : 'Aucune'}${observation.otherFamilyDiseases ? `, ${observation.otherFamilyDiseases}` : ''}.</p>
+            `;
+            
+            if (observation.menarcheAge || observation.menopauseStatus || observation.pregnanciesCount) {
+                html += `<p><strong>Gynéco-obstétricaux:</strong> Ménarchie: ${observation.menarcheAge || 'Non renseigné'} ans, Ménopause: ${observation.menopauseStatus || 'Non renseigné'}, Cycles: ${observation.cycleSymptoms && observation.cycleSymptoms.length > 0 ? observation.cycleSymptoms.join(', ') : 'Normaux'}, Anomalies: ${observation.cycleAnomalies && observation.cycleAnomalies.length > 0 ? observation.cycleAnomalies.join(', ') : 'Aucune'}, Grossesses: ${observation.pregnanciesCount || '0'}, Accouchements: ${observation.deliveriesCount || '0'}.</p>`;
+            }
+            
+            html += `</div></div>`;
+            
+            html += `
+            <div class="border-l-4 border-blue-500 pl-3 md:pl-4">
+                <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">Contexte épidémiologique</h4>
+                <div class="text-gray-700 text-sm md:text-base">
+                    <p>Mode de vie: ${observation.lifestyle || 'Non renseigné'}, Niveau socio-économique: ${observation.socioEconomicLevel || 'Non renseigné'}, Contage tuberculeux: ${observation.tbExposure || 'Non renseigné'}, Source d'eau: ${observation.waterSource || 'Non renseigné'}, Animaux: ${observation.animals && observation.animals.length > 0 ? observation.animals.join(', ') : 'Aucun'}.</p>
                 </div>
             </div>
             `;
             
             html += `
             <div class="border-l-4 border-blue-500 pl-3 md:pl-4">
-                <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">Examen général</h4>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 text-gray-700 text-sm md:text-base">
-                    <div><span class="font-medium">Conscience:</span> ${observation.consciousness}</div>
-                    <div><span class="font-medium">TA:</span> ${observation.bloodPressure || 'Non mesurée'}</div>
-                    <div><span class="font-medium">Pouls:</span> ${observation.pulse || 'Non mesuré'} bpm</div>
-                    <div><span class="font-medium">Température:</span> ${observation.temperature || 'Non mesurée'} °C</div>
-                    <div><span class="font-medium">Poids:</span> ${observation.weight || 'Non mesuré'} kg</div>
-                    <div><span class="font-medium">FR:</span> ${observation.respiratoryRate || 'Non mesurée'} cpm</div>
+                <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">État général</h4>
+                <div class="text-gray-700 text-sm md:text-base">
+                    <p>Conscience: ${observation.consciousness || 'Non renseigné'}, Coopération: ${observation.cooperation || 'Non renseigné'}, Orientation: ${observation.orientation || 'Non renseigné'}, Coloration: ${observation.skinColor || 'Non renseigné'}, Posture: ${observation.posture && observation.posture.length > 0 ? observation.posture.join(', ') : 'Normale'}, État de la peau: ${observation.skinCondition && observation.skinCondition.length > 0 ? observation.skinCondition.join(', ') : 'Normal'}${observation.skinDetails ? ` (${observation.skinDetails})` : ''}, Signes généraux: ${observation.generalSigns && observation.generalSigns.length > 0 ? observation.generalSigns.join(', ') : 'Aucun'}.</p>
+                    <p><strong>Constantes vitales:</strong> Pouls: ${observation.pulse || '?'} bpm, FR: ${observation.respiratoryRate || '?'} cpm, PA: ${observation.bloodPressure || '?'} mmHg, Température: ${observation.temperature || '?'}°C, Poids: ${observation.weight || '?'} kg.</p>
                 </div>
             </div>
             `;
             
-            html += `
-            <div class="border-l-4 border-blue-500 pl-3 md:pl-4">
-                <h4 class="text-base md:text-lg font-bold text-gray-800 mb-2">Examens par appareil</h4>
-                <div class="space-y-2 md:space-y-3 text-gray-700 text-sm md:text-base">
-                    ${observation.respiratoryExam ? `<div><span class="font-medium">Respiratoire:</span> ${observation.respiratoryExam}</div>` : ''}
-                    ${observation.cardiovascularExam ? `<div><span class="font-medium">Cardio-vasculaire:</span> ${observation.cardiovascularExam}</div>` : ''}
-                    ${observation.digestiveExam ? `<div><span class="font-medium">Digestif:</span> ${observation.digestiveExam}</div>` : ''}
-                    ${observation.urinaryExam ? `<div><span class="font-medium">Urinaire:</span> ${observation.urinaryExam}</div>` : ''}
-                    ${observation.neurologicalExam ? `<div><span class="font-medium">Neurologique:</span> ${observation.neurologicalExam}</div>` : ''}
-                    ${observation.hematologicalExam ? `<div><span class="font-medium">Hématologique:</span> ${observation.hematologicalExam}</div>` : ''}
-                </div>
-            </div>
-            `;
             
             content.innerHTML = html;
             
             document.getElementById('observationDetailModal').classList.remove('hidden');
+            
+            if (window.innerWidth < 768) {
+                const modalContent = document.querySelector('#observationDetailModal .overflow-y-auto');
+                if (modalContent) {
+                    modalContent.style.maxHeight = 'calc(100vh - 150px)';
+                }
+            }
         }
 
         function closeModal() {
@@ -1141,38 +2245,25 @@
             const obs = appState.currentObservation;
             appState.editingObservationId = obs.id;
             
-            document.getElementById('patientName').value = obs.patientName;
-            document.getElementById('patientAge').value = obs.patientAge;
-            document.getElementById('patientGender').value = obs.patientGender;
-            document.getElementById('familySituation').value = obs.familySituation || '';
-            document.getElementById('childrenCount').value = obs.childrenCount || '';
-            document.getElementById('profession').value = obs.profession || '';
-            document.getElementById('hospitalService').value = obs.hospitalService;
-            document.getElementById('mainSymptom').value = obs.mainSymptom;
-            document.getElementById('symptomDate').value = obs.symptomDate;
-            document.getElementById('symptomNature').value = obs.symptomNature || '';
-            document.getElementById('symptomOnset').value = obs.symptomOnset || '';
-            document.getElementById('triggerFactors').value = obs.triggerFactors || '';
-            document.getElementById('reliefFactors').value = obs.reliefFactors || '';
-            document.getElementById('associatedSymptoms').value = obs.associatedSymptoms || '';
-            document.getElementById('personalHistory').value = obs.personalHistory || '';
-            document.getElementById('familyHistory').value = obs.familyHistory || '';
-            document.getElementById('gynecoHistory').value = obs.gynecoHistory || '';
-            document.getElementById('consciousness').value = obs.consciousness;
-            document.getElementById('bloodPressure').value = obs.bloodPressure || '';
-            document.getElementById('pulse').value = obs.pulse || '';
-            document.getElementById('temperature').value = obs.temperature || '';
-            document.getElementById('weight').value = obs.weight || '';
-            document.getElementById('respiratoryRate').value = obs.respiratoryRate || '';
-            document.getElementById('respiratoryExam').value = obs.respiratoryExam || '';
-            document.getElementById('cardiovascularExam').value = obs.cardiovascularExam || '';
-            document.getElementById('digestiveExam').value = obs.digestiveExam || '';
-            document.getElementById('urinaryExam').value = obs.urinaryExam || '';
-            document.getElementById('neurologicalExam').value = obs.neurologicalExam || '';
-            document.getElementById('hematologicalExam').value = obs.hematologicalExam || '';
+            if (document.getElementById('patientName')) document.getElementById('patientName').value = obs.patientName || '';
+            if (document.getElementById('birthDate')) document.getElementById('birthDate').value = obs.birthDate || '';
+            if (document.getElementById('patientAge')) document.getElementById('patientAge').value = obs.patientAge || '';
+            if (document.getElementById('origin')) document.getElementById('origin').value = obs.origin || '';
+            if (document.getElementById('address')) document.getElementById('address').value = obs.address || '';
+            if (document.getElementById('civilStatus')) document.getElementById('civilStatus').value = obs.civilStatus || '';
+            if (document.getElementById('childrenCount')) document.getElementById('childrenCount').value = obs.childrenCount || '';
+            if (document.getElementById('profession')) document.getElementById('profession').value = obs.profession || '';
+            if (document.getElementById('hospitalizationDate')) document.getElementById('hospitalizationDate').value = obs.hospitalizationDate || '';
+            if (document.getElementById('hospitalService')) document.getElementById('hospitalService').value = obs.hospitalService || '';
+            if (document.getElementById('mainSymptom')) document.getElementById('mainSymptom').value = obs.mainSymptom || '';
             
-            if (obs.patientGender === 'Féminin') {
-                document.getElementById('gynecoHistorySection').classList.remove('hidden');
+            
+            const patientGender = document.getElementById('patientGender');
+            if (patientGender) {
+                if (obs.menarcheAge || obs.pregnanciesCount) {
+                    patientGender.value = 'Féminin';
+                    document.getElementById('gynecoSection').classList.remove('hidden');
+                }
             }
             
             updateFormProgress();
@@ -1201,9 +2292,9 @@
             const dateFilter = document.getElementById('dateFilter').value;
             
             const filtered = appState.observations.filter(obs => {
-                if (searchTerm && !obs.patientName.toLowerCase().includes(searchTerm) && 
-                    !obs.mainSymptom.toLowerCase().includes(searchTerm) &&
-                    !obs.hospitalService.toLowerCase().includes(searchTerm)) {
+                if (searchTerm && !(obs.patientName && obs.patientName.toLowerCase().includes(searchTerm)) && 
+                    !(obs.mainSymptom && obs.mainSymptom.toLowerCase().includes(searchTerm)) &&
+                    !(obs.hospitalService && obs.hospitalService.toLowerCase().includes(searchTerm))) {
                     return false;
                 }
                 
@@ -1215,7 +2306,7 @@
                     return false;
                 }
                 
-                if (dateFilter) {
+                if (dateFilter && obs.createdDate) {
                     const obsDate = new Date(obs.createdDate).toISOString().split('T')[0];
                     if (obsDate !== dateFilter) {
                         return false;
@@ -1241,7 +2332,7 @@
             const total = appState.observations.length;
             const today = new Date().toISOString().split('T')[0];
             const todayCount = appState.observations.filter(obs => {
-                return obs.createdDate.split('T')[0] === today;
+                return obs.createdDate && obs.createdDate.split('T')[0] === today;
             }).length;
             const incompleteCount = appState.observations.filter(obs => obs.status === 'draft').length;
             
