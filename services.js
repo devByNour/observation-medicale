@@ -51,3 +51,13 @@ services.forEach(service => {
   option.textContent = service;
   select.appendChild(option);
 });
+
+const selectFilter = document.getElementById("hospitalServiceFilter");
+
+services.forEach(service => {
+  const option = document.createElement("option");
+  option.value = service;
+  option.textContent = service;
+  selectFilter.appendChild(option);
+});
+
